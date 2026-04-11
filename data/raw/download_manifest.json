@@ -1,0 +1,28 @@
+[
+  {
+    "dataset": "diginetica",
+    "kaggle_dataset": "profalbusdumbledore/diginetica-dataset",
+    "download_date_utc": "2026-04-11T12:24:46.965546+00:00",
+    "raw_file_names": [
+      "diginetica/train-item-views.csv",
+      "diginetica/product-categories.csv"
+    ],
+    "raw_file_sizes_bytes": {
+      "diginetica/train-item-views.csv": 42664076,
+      "diginetica/product-categories.csv": 1979575
+    }
+  },
+  {
+    "dataset": "yoochoose",
+    "kaggle_dataset": "phhasian0710/yoochoose",
+    "download_date_utc": "2026-04-11T12:24:46.965546+00:00",
+    "raw_file_names": [
+      "yoochoose/yoochoose-clicks.dat",
+      "yoochoose/yoochoose-buys.dat"
+    ],
+    "raw_file_sizes_bytes": {
+      "yoochoose/yoochoose-clicks.dat": 1486798186,
+      "yoochoose/yoochoose-buys.dat": 55583744
+    }
+  }
+]

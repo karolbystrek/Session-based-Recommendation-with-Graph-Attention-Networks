@@ -37,7 +37,7 @@ This main question can be divided into three subordinate questions:
 
 The study is built around two baseline graph-based session recommendation frameworks:
 
-### 1. SR-GNN-style branch
+### 1. [SR-GNN-style branch](./Session-based%20Recommendation%20with%20Graph%20Neural%20Networks.pdf)
 
 In SR-GNN, each session is converted into a directed session graph and item embeddings are learned through graph propagation. The session representation is then formed as a **hybrid of two components**:
 
@@ -46,7 +46,7 @@ In SR-GNN, each session is converted into a directed session graph and item embe
 
 This branch of the study will preserve that second-stage design while replacing only the GGNN encoder with GAT.
 
-### 2. TAGNN-style branch
+### 2. [TAGNN-style branch](./TAGNN:%20Target%20Attentive%20Graph%20Neural%20Networks%20for%20Session-based%20Recommendation.pdf)
 
 TAGNN also uses graph-based item encoding, but differs in the readout stage. Instead of using a single fixed session vector, it introduces **target-aware attention**, so that the representation of the session is conditioned on the candidate next item. This makes the session embedding adaptive rather than static.
 

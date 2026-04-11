@@ -57,7 +57,7 @@
   - source URL
   - download date
   - raw file names
-  - raw dataset sizes
+  - raw dataset sizesyoo
 - Verify that the dataset fields needed for session reconstruction exist:
   - session ID
   - item ID
