@@ -2,4 +2,7 @@ requests
 pandas
 numpy
 torch
+torch_geometric
 kagglehub
+networkx
+matplotlib

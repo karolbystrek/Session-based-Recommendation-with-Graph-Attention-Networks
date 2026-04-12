@@ -141,40 +141,7 @@
 
 ---
 
-## 7. Establish the experimental baseline family
-
-Before introducing GAT, implement or reproduce the original-style baselines so you have a trustworthy reference point.
-
-### Baseline A: Original-style SR-GNN
-
-- Session graph encoder:
-  - GGNN
-- Readout / second phase:
-  - local embedding from last clicked item
-  - global embedding from attention over items in session
-  - hybrid session embedding combining local + global
-- Prediction:
-  - score candidate items against session representation
-
-### Baseline B: Original-style TAGNN
-
-- Session graph encoder:
-  - GGNN
-- Readout / second phase:
-  - local embedding
-  - global attentive embedding
-  - target-aware attention branch
-  - target-conditioned session representation
-- Prediction:
-  - produce session representation separately for each target item
-
-### Goal of this stage
-
-- Verify that your implementation is directionally consistent with the papers before replacing GGNN with GAT.
-
----
-
-## 8. Implement the shared GAT encoder
+## 7. Implement the shared GAT encoder
 
 - Replace the GGNN encoder with a GAT encoder.
 - Design decisions to explicitly control:
@@ -196,7 +163,7 @@ Before introducing GAT, implement or reproduce the original-style baselines so y
 
 ---
 
-## 9. Implement the three main study architectures
+## 8. Implement the three main study architectures
 
 ### Model 1: GAT-SR-GNN
 
@@ -231,7 +198,7 @@ Before introducing GAT, implement or reproduce the original-style baselines so y
 
 ---
 
-## 10. Add ablation variants
+## 9. Add ablation variants
 
 Create controlled variants so you can explain where gains come from.
 
@@ -257,7 +224,7 @@ Create controlled variants so you can explain where gains come from.
 
 ---
 
-## 11. Create a unified training pipeline
+## 10. Create a unified training pipeline
 
 - Build one training script that accepts:
   - dataset
@@ -286,7 +253,7 @@ Create controlled variants so you can explain where gains come from.
 
 ---
 
-## 12. Create a fair hyperparameter protocol
+## 11. Create a fair hyperparameter protocol
 
 - Use a single tuning policy across all comparable models.
 - Choose a validation split from the training data.
@@ -309,7 +276,7 @@ Create controlled variants so you can explain where gains come from.
 
 ---
 
-## 13. Run the full experiment matrix
+## 12. Run the full experiment matrix
 
 For each dataset:
 
@@ -343,7 +310,7 @@ For each configuration:
 
 ---
 
-## 14. Evaluate the models
+## 13. Evaluate the models
 
 - Compute the main ranking metrics:
   - Precision@20
@@ -360,7 +327,7 @@ For each configuration:
 
 ---
 
-## 15. Run statistical and robustness checks
+## 14. Run statistical and robustness checks
 
 - Compare:
   - GGNN vs GAT within the same architecture
@@ -378,7 +345,7 @@ For each configuration:
 
 ---
 
-## 16. Perform qualitative analysis
+## 15. Perform qualitative analysis
 
 - Visualize sample session graphs.
 - Inspect learned attention weights for GAT-based models.
@@ -393,7 +360,7 @@ For each configuration:
 
 ---
 
-## 17. Summarize the results in publication-ready form
+## 16. Summarize the results in publication-ready form
 
 Create result tables for:
 
@@ -418,7 +385,7 @@ Write down:
 
 ---
 
-## 18. Draw final conclusions
+## 17. Draw final conclusions
 
 - Answer whether GAT improves the graph encoding phase overall.
 - Answer whether improvements transfer consistently across different second phases.
@@ -430,7 +397,7 @@ Write down:
 
 ---
 
-## 19. Package the study for reproducibility
+## 18. Package the study for reproducibility
 
 - Release:
   - preprocessing scripts
@@ -447,7 +414,7 @@ Write down:
 
 ---
 
-## 20. Final practical checklist
+## 19. Final practical checklist
 
 - [ ] Raw datasets downloaded
 - [ ] Preprocessing reproduced
