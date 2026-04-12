@@ -1,10 +1,7 @@
-data/**
-!data/raw/
-data/raw/**
-!data/raw/download_manifest.json
 .venv/
 .DS_Store
 __pycache__/
+data/raw/
 *.pyc
 *.pyo
 *.pyd
