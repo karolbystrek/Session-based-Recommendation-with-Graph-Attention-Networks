@@ -1,0 +1,13 @@
+# PyTorch: use https://pytorch.org/get-started/locally/ if you need a specific CUDA wheel;
+# on macOS, `pip install -r requirements.txt` pulls CPU/MPS-capable builds from PyPI.
+torch>=2.1.0
+torchvision>=0.16.0
+torchaudio>=2.1.0
+torch-geometric>=2.4.0
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.13.0
+kagglehub>=0.2.0
+jupyter>=1.0.0
+ipykernel>=6.25.0
