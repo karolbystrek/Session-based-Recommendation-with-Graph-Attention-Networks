@@ -1,0 +1,3 @@
+dataset,test_precision@20,test_mrr@20,test_loss,paper_precision@20,paper_mrr@20,delta_precision@20,delta_mrr@20,best_epoch,best_validation_precision@20,best_validation_mrr@20,train_examples,validation_examples,test_examples,num_items,checkpoint_path
+Yoochoose 1/64,68.59100504490321,29.8917979297367,4.545708339318141,71.02,31.12,-2.4289949550967833,-1.2282020702633005,30,66.83790725969988,31.335832235602666,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_tagnn_yoochoose_1_64.pt
+Diginetica,50.92510434125341,17.128131640267313,5.616529656951507,51.31,18.03,-0.3848956587465935,-0.9018683597326884,25,55.26846150638664,19.505326986853017,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_tagnn_diginetica.pt

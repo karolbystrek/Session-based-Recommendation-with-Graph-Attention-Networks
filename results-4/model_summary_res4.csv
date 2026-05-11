@@ -1,0 +1,5 @@
+model,dataset,test_precision@20,test_mrr@20,test_loss,best_epoch,best_validation_precision@20,best_validation_mrr@20,train_examples,validation_examples,test_examples,num_items,checkpoint_path
+GAT-SR-GNN,Yoochoose 1/64,68.75380156714014,30.594947324540772,4.455015960884988,27,66.75408949574151,31.767053453281186,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sr_gnn_yoochoose_1_64.pt
+GAT-SR-GNN,Diginetica,50.45351473922903,16.802281048237628,5.663553957519336,19,55.2434430900524,19.52882529560987,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt
+GAT-TAGNN,Yoochoose 1/64,,,,,,,,,,,pending: add results-4/gat_tagnn_results.csv after training
+GAT-TAGNN,Diginetica,,,,,,,,,,,pending: add results-4/gat_tagnn_results.csv after training

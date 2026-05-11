@@ -1,0 +1,17 @@
+model,folder,dataset,test_precision@20,test_mrr@20,test_loss,best_epoch,best_validation_precision@20,best_validation_mrr@20,train_examples,validation_examples,test_examples,num_items,checkpoint_path,iteration,status
+GAT-SR-GNN,results-1,Diginetica,50.24976174044497,16.646332120859345,5.553235306232554,4,55.79523816142438,19.413401246881087,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt,1,trained
+GAT-SR-GNN,results-2,Diginetica,50.62933385914752,16.725053249420434,5.656550333507665,28,55.2073053775696,19.485921018166408,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt,2,trained
+GAT-SR-GNN,results-3,Diginetica,50.736139866574646,16.855089593706992,5.653700135603443,19,55.4783382211906,19.562712989128567,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt,3,trained
+GAT-SR-GNN,results-4,Diginetica,50.45351473922903,16.802281048237628,5.663553957519336,19,55.2434430900524,19.52882529560987,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt,4,trained
+GAT-SR-GNN,results-1,Yoochoose 1/64,70.1241547103653,31.146230274178464,4.341722839381674,9,69.47411112613221,32.70574200196864,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sr_gnn_yoochoose_1_64.pt,1,trained
+GAT-SR-GNN,results-2,Yoochoose 1/64,68.72875594833447,30.354838888394973,4.455313577289943,29,66.87305664458565,31.679530023190885,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sr_gnn_yoochoose_1_64.pt,2,trained
+GAT-SR-GNN,results-3,Yoochoose 1/64,68.94164370818277,30.562543558508832,4.450819712853175,25,66.90279843179667,31.759023538743932,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sr_gnn_yoochoose_1_64.pt,3,trained
+GAT-SR-GNN,results-4,Yoochoose 1/64,68.75380156714014,30.594947324540772,4.455015960884988,27,66.75408949574151,31.767053453281186,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sr_gnn_yoochoose_1_64.pt,4,trained
+GAT-TAGNN,results-1,Diginetica,51.25209504091492,17.352993099135297,5.522456880897472,4,55.7493710648116,19.65077164118548,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_tagnn_diginetica.pt,1,trained
+GAT-TAGNN,results-2,Diginetica,,,,,,,,,,,pending rerun,2,pending
+GAT-TAGNN,results-3,Diginetica,50.92510434125341,17.128131640267313,5.616529656951507,25,55.26846150638664,19.505326986853017,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_tagnn_diginetica.pt,3,trained
+GAT-TAGNN,results-4,Diginetica,,,,,,,,,,,pending rerun,4,pending
+GAT-TAGNN,results-1,Yoochoose 1/64,70.61075530430426,31.003700854710132,4.328161679029405,10,69.72286061916994,32.66876621408786,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_tagnn_yoochoose_1_64.pt,1,trained
+GAT-TAGNN,results-2,Yoochoose 1/64,,,,,,,,,,,pending rerun,2,pending
+GAT-TAGNN,results-3,Yoochoose 1/64,68.59100504490321,29.8917979297367,4.545708339318141,30,66.83790725969988,31.335832235602663,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_tagnn_yoochoose_1_64.pt,3,trained
+GAT-TAGNN,results-4,Yoochoose 1/64,,,,,,,,,,,pending rerun,4,pending
