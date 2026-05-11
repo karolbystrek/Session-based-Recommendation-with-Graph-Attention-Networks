@@ -1,4 +1,6 @@
 model,iteration,folder,dataset,test_precision@20,test_mrr@20,test_loss,best_epoch,best_validation_precision@20,best_validation_mrr@20,train_examples,validation_examples,test_examples,num_items,checkpoint_path
+GAT-SAGPool,1,results-gat-sagpool,Diginetica,50.427224029708505,16.743125199072814,5.531137394236744,4,55.464439101004906,19.49043549104438,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sagpool_diginetica.pt
+GAT-SAGPool,1,results-gat-sagpool,Yoochoose 1/64,70.18497978460768,30.881512091280868,4.336914806341399,7,69.3064755982155,32.57117839347548,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sagpool_yoochoose_1_64.pt
 GAT-SR-GNN,1,results-1,Diginetica,50.24976174044497,16.646332120859345,5.553235306232554,4,55.79523816142438,19.413401246881087,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt
 GAT-SR-GNN,2,results-2,Diginetica,50.62933385914752,16.725053249420434,5.656550333507665,28,55.2073053775696,19.485921018166408,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt
 GAT-SR-GNN,3,results-3,Diginetica,50.736139866574646,16.855089593706992,5.653700135603443,19,55.4783382211906,19.562712989128567,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sr_gnn_diginetica.pt
