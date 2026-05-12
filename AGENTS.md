@@ -177,3 +177,5 @@ When reporting research claims:
 - do not claim GAT outperforms GGNN without direct baseline under same protocol
 - cite Precision@20 and MRR@20 with dataset and split
 - mention memory constraint for Yoochoose 1/4 if skipped
+
+When you change model architecture in notebooks for training models, update introduction of `results_analysis.ipynb` file as well.
