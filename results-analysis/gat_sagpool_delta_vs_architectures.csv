@@ -1,9 +1,0 @@
-dataset,comparison,metric,delta
-Diginetica,SAGPool - SR-GNN,Precision@20,-0.30891583686614155
-Diginetica,SAGPool - SR-GNN,MRR@20,-0.11196439463417818
-Diginetica,SAGPool - TAGNN,Precision@20,-0.8248710112064117
-Diginetica,SAGPool - TAGNN,MRR@20,-0.6098679000624827
-Yoochoose 1/64,SAGPool - SR-GNN,Precision@20,0.06082507424237349
-Yoochoose 1/64,SAGPool - SR-GNN,MRR@20,-0.26471818289759597
-Yoochoose 1/64,SAGPool - TAGNN,Precision@20,-0.425775519696586
-Yoochoose 1/64,SAGPool - TAGNN,MRR@20,-0.12218876342926421
