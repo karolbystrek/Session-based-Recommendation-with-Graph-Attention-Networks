@@ -5,3 +5,4 @@ iteration,folder,GAT-SR-GNN status,GAT-TAGNN status,What Changed
 4,results-4,trained,pending,Repeated transition edges plus explicit residual connections in the GAT stack; TAGNN still pending.
 5,results-5,trained,trained,Failed edge-attribute/gated-normalization ablation: normalized edge_attr for GATv2Conv(edge_dim=1) with gated residual blending and LayerNorm per directional GAT stack; hidden_dim remains 100.
 6,results-6,trained,trained,"Shared GAT-only recovery iteration with repeated transition edges by default, no scalar edge_attr, GATv2Conv, plain residual and one layer; SR-GNN/TAGNN readouts unchanged."
+7,results-7,trained,trained,"GAT-only identity-preserving fusion: same iteration-6 GATv2 stack, then add original item embedding after direction fusion; SR-GNN/TAGNN readouts unchanged."
