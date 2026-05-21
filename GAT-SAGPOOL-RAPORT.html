@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GAT-SAGPool — raport projektu</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent2: #d97706;
+      --border: #e2e8f0;
+      --good: #16a34a;
+      --bad: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: #fff;
+      padding: 2.5rem 2rem;
+    }
+    header h1 { margin: 0 0 0.5rem; font-size: 1.85rem; }
+    header p { margin: 0; opacity: 0.92; max-width: 52rem; }
+    main { max-width: 920px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 1rem;
+      color: #0f172a;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.35rem;
+    }
+    h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; color: #334155; }
+    p { margin: 0.6rem 0; }
+    ul, ol { margin: 0.5rem 0; padding-left: 1.35rem; }
+    li { margin: 0.35rem 0; }
+    .muted { color: var(--muted); font-size: 0.92rem; }
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      margin-right: 0.35rem;
+    }
+    .tag-paper { background: #e2e8f0; color: #475569; }
+    .tag-ours { background: #fef3c7; color: #92400e; }
+    .tag-gat { background: #dbeafe; color: #1d4ed8; }
+    figure {
+      margin: 1.25rem 0;
+      text-align: center;
+    }
+    figure img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+    figcaption {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      text-align: left;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.6rem;
+      text-align: left;
+    }
+    th { background: #f1f5f9; font-weight: 600; }
+    .up { color: var(--good); font-weight: 600; }
+    .down { color: var(--bad); font-weight: 600; }
+    .flow {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-family: Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .callout {
+      border-left: 4px solid var(--accent2);
+      background: #fffbeb;
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    nav.toc {
+      background: #f1f5f9;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+    nav.toc ol { margin: 0; }
+    nav.toc a { color: var(--accent); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding: 2rem 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>GAT-SAGPool — raport z notebooka i treningu</h1>
+  <p>Session-based recommendation z grafem kliknięć, enkoderem GAT i autorskim readoutem SAGPool. Prosty opis całego podejścia, faz ulepszeń i wyników w porównaniu z modelami z literatury.</p>
+</header>
+
+<main>
+
+<nav class="toc">
+  <strong>Spis treści</strong>
+  <ol>
+    <li><a href="#cel">O co chodzi w projekcie</a></li>
+    <li><a href="#trzy">Trzy notebooki — SR-GNN, TAGNN, SAGPool</a></li>
+    <li><a href="#sagpool-czym">Czym jest SAGPool i po co go zrobiliśmy</a></li>
+    <li><a href="#jak">Jak działa GAT-SAGPool krok po kroku</a></li>
+    <li><a href="#fazy">Fazy ulepszania modelu</a></li>
+    <li><a href="#wyniki">Wyniki i wykresy</a></li>
+    <li><a href="#wnioski">Wnioski</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="cel">
+  <h2>1. O co chodzi w projekcie</h2>
+  <p>Badamy <strong>rekomendacje w sesji zakupowej</strong>: użytkownik klika produkty po kolei (bez logowania), a system ma <strong>zgadnąć następny produkt</strong>, który prawdopodobnie kliknie. To nie prognoza sprzedaży — to przewidywanie <em>kolejnego elementu z historii</em>.</p>
+  <p>Każda sesja zamieniana jest w <strong>graf</strong>: węzły to produkty, krawędzie to kolejne przejścia między kliknięciami. Na grafie działa sieć neuronowa, która uczy się „rozumieć” sesję i ocenia wszystkie znane produkty — prawdziwy następny ma dostać wysoki wynik.</p>
+  <p><strong>Główne pytanie badawcze:</strong> czy zamiast klasycznego enkodera grafowego (GGNN z artykułów) lepiej sprawdzi się <strong>GAT</strong> (Graph Attention Network — sieć z wagami uwagi na sąsiadach)? I czy wynik zależy od tego, <strong>jak na końcu składamy graf w jeden opis sesji</strong> (readout)?</p>
+  <p>Datasety: <strong>Yoochoose 1/64</strong> i <strong>Diginetica</strong>. Metryki: <strong>Precision@20</strong> (czy trafienie jest w top-20 rekomendacji) i <strong>MRR@20</strong> (jak wysoko na liście — im wyżej, tym lepiej).</p>
+</section>
+
+<!-- 2 -->
+<section id="trzy">
+  <h2>2. Trzy notebooki — dwa z literatury, jeden autorski</h2>
+  <p>W projekcie są trzy gałęzie. Wspólne: ten sam sposób czyszczenia danych, budowy grafu sesji i (u nas) enkoder <strong>GAT</strong> zamiast GGNN z oryginalnych prac. Różnią się <strong>drugą częścią modelu</strong> — sposobem złożenia węzłów grafu w jeden wektor sesji.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Notebook</th>
+        <th>Źródło</th>
+        <th>Co zmieniliśmy</th>
+        <th>Po co</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>gat_sr_gnn_architecture.ipynb</code></td>
+        <td><span class="tag tag-paper">SR-GNN</span> artykuł naukowy</td>
+        <td>GGNN → <strong>GAT</strong>; readout SR-GNN bez zmian</td>
+        <td>Sprawdzić, czy GAT poprawia wynik przy <em>klasycznym</em> opisie sesji (uwaga globalna + ostatnie kliknięcie)</td>
+      </tr>
+      <tr>
+        <td><code>gat_tagnn_architecture.ipynb</code></td>
+        <td><span class="tag tag-paper">TAGNN</span> artykuł naukowy</td>
+        <td>GGNN → <strong>GAT</strong>; readout TAGNN bez zmian</td>
+        <td>Sprawdzić GAT z <em>uwagą zależną od kandydata</em> — opis sesji zmienia się w zależności od ocenianego produktu</td>
+      </tr>
+      <tr>
+        <td><code>gat_sagpool_architecture.ipynb</code></td>
+        <td><span class="tag tag-ours">autorski</span> GAT + SAGPool</td>
+        <td>Inny readout: <strong>SAGPool</strong> zamiast SR-GNN/TAGNN</td>
+        <td>Przetestować w pełni „uwagowy” pipeline: GAT na węzłach + pooling wybierający ważne węzły — nasz pomysł eksploracyjny</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Krótko: czym różnią się readouty</h3>
+  <ul>
+    <li><strong>SR-GNN:</strong> jeden wektor sesji = ostatnie kliknięcie + ważona suma wszystkich pozycji w prefiksie. Ten sam wektor dla wszystkich produktów-kandydatów.</li>
+    <li><strong>TAGNN:</strong> najpierw szkic sesji, potem dla <em>każdego</em> kandydata osobna uwaga — „czy ta sesja pasuje do tego produktu?”.</li>
+    <li><strong>SAGPool (nasz):</strong> model ocenia węzły grafu, zostawia część „najważniejszych”, robi z nich zwięzły opis całej sesji + dokleja sygnał ostatniego kliknięcia.</li>
+  </ul>
+
+  <figure>
+    <img src="report-assets/sagpool/compare_all_models_yoochoose_164.png" alt="Porównanie modeli Yoochoose">
+    <figcaption>Rys. 1 — Yoochoose 1/64: wyniki z artykułów (szary), nasze GAT-SR-GNN / GAT-TAGNN (niebieski), najlepszy GAT-SAGPool (zielony). Jesteśmy blisko literatury, ale TAGNN (paper i nasz) wygrywa na P@20.</figcaption>
+  </figure>
+  <figure>
+    <img src="report-assets/sagpool/compare_all_models_diginetica.png" alt="Porównanie modeli Diginetica">
+    <figcaption>Rys. 2 — Diginetica: tu luka jest większa — GAT-TAGNN najbliżej wyników z papieru; SAGPool wyraźnie słabszy.</figcaption>
+  </figure>
+</section>
+
+<!-- 3 -->
+<section id="sagpool-czym">
+  <h2>3. Czym jest SAGPool i po co go zrobiliśmy</h2>
+  <div class="callout">
+    <strong>SAGPool</strong> (Self-Attention Graph Pooling) pochodzi z literatury o grafach ogólnie — my <strong>połączyliśmy go po raz pierwszy w tym projekcie</strong> z pipeline’em sesji jak w SR-GNN/TAGNN + enkoder GAT. To nie gotowy model z jednej pracy o rekomendacjach — to <strong>nasza autorska trzecia gałąź</strong>.
+  </div>
+  <p><strong>Cel architektury:</strong> sprawdzić, czy zamiast readoutu z SR-GNN lub TAGNN można użyć mechanizmu, który <strong>sam wybiera najważniejsze węzły</strong> w grafie sesji i z nich buduje opis — spójnie z ideą „wszystko na uwadze”, bez osobnej fazy target-aware jak w TAGNN.</p>
+  <p><strong>Charakterystyka SAGPool w naszym wariancie:</strong></p>
+  <ul>
+    <li>Każdy węzeł (produkt w prefiksie) dostaje <strong>ocenę ważności</strong>.</li>
+    <li>Zostaje tylko <strong>top frakcja</strong> węzłów (u nas domyślnie 70% — parametr <code>sagpool_ratio</code>).</li>
+    <li>Z pozostałych liczymy <strong>średnią i maksimum</strong> embeddingów → opis „całej sesji”.</li>
+    <li>Pooling <strong>nie pamięta kolejności</strong> kliknięć — dlatego <strong>jawnie dokładamy embedding ostatniego kliknięcia</strong> (sygnał „co user zrobił na końcu”).</li>
+    <li>Na końcu ten opis sesji porównujemy z embeddingami wszystkich produktów ze słownika (jak w pozostałych notebookach).</li>
+  </ul>
+</section>
+
+<!-- 4 -->
+<section id="jak">
+  <h2>4. Jak działa GAT-SAGPool — krok po kroku</h2>
+  <p>Poniżej przepływ danych w notebooku <code>gat_sagpool_architecture.ipynb</code>. Zakładamy, że nie znasz szczegółów ML — chodzi o <em>logiczną kolejność</em>.</p>
+
+  <h3>Etap A — dane wejściowe</h3>
+  <ol>
+    <li>Bierzemy logi kliknięć (Yoochoose / Diginetica).</li>
+    <li>Usuwamy za krótkie sesje i zbyt rzadkie produkty.</li>
+    <li>Dzielimy dane <strong>czasowo</strong> (starsze = trening, nowsze = test).</li>
+    <li>Z sesji <code>[A, B, C, D]</code> robimy wiele przykładów: <code>[A]→B</code>, <code>[A,B]→C</code>, <code>[A,B,C]→D</code>.</li>
+  </ol>
+
+  <h3>Etap B — graf sesji</h3>
+  <p>Prefiks <code>[A, B, C]</code> → graf: węzły = unikalne produkty {A, B, C}, krawędzie = przejścia w kolejności kliknięć (w przód i w tył). Powtarzające się produkty w prefiksie to ten sam węzeł.</p>
+
+  <h3>Etap C — enkoder GAT (wspólny pomysł ze wszystkimi trzema notebookami)</h3>
+  <ol>
+    <li>Każdy produkt ma wektor liczb (embedding) — uczy się w treningu.</li>
+    <li><strong>GAT w przód:</strong> węzeł zbiera sygnał od sąsiadów z wagami uwagi („które przejście ważniejsze”).</li>
+    <li><strong>GAT w tył:</strong> to samo po odwróconych krawędziach.</li>
+    <li>Wyniki obu kierunków sklejamy i redukujemy do jednego wektora na węzeł (wymiar 100).</li>
+  </ol>
+  <p>To zamiana GGNN z oryginalnych artykułów — reszta protokołu (metryki, podział danych) zostaje podobna.</p>
+
+  <h3>Etap D — readout SAGPool (tylko w tym notebooku)</h3>
+  <div class="flow">prefiks sesji
+    → graf (węzły + krawędzie)
+    → GAT (forward + backward) → embeddingi węzłów
+    ├─→ [ścieżka A] ostatnie kliknięcie: wektor „co na końcu”
+    └─→ [ścieżka B] SAGPool:
+           ocena ważności każdego węzła
+           → zostaw top 70% węzłów
+           → średnia + max po węzłach = opis całej sesji
+    → sklejka (opis z poolingu + ostatnie kliknięcie)
+    → iloczyn z macierzą wszystkich produktów = wynik dla każdego kandydata
+    → uczymy: prawdziwy następny produkt ma mieć najwyższy wynik</div>
+
+  <h3>Etap E — trening i ocena</h3>
+  <ul>
+    <li>Optymalizator Adam, uczenie przez wiele epok, wczesne zatrzymanie gdy walidacja przestaje rosnąć.</li>
+    <li>Wybór najlepszego checkpointu po <strong>MRR@20 na walidacji</strong>.</li>
+    <li>Metryki końcowe liczone na zbiorze testowym (nigdy nie widzianym w treningu).</li>
+  </ul>
+</section>
+
+<!-- 5 -->
+<section id="fazy">
+  <h2>5. Fazy ulepszania GAT-SAGPool</h2>
+  <p>Model nie trenowaliśmy „raz i koniec”. Poniżej chronologia — co próbowaliśmy i jaki był efekt na <strong>zbiorze testowym</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Faza</th><th>Co zmieniliśmy</th><th>Yoochoose (P@20 / MRR)</th><th>Diginetica (P@20 / MRR)</th><th>Efekt</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Baseline</strong></td>
+        <td>Pierwszy działający SAGPool: ratio=0.5, 1 warstwa GAT</td>
+        <td>70.04 / 30.90</td>
+        <td>50.28 / 16.66</td>
+        <td>Punkt odniesienia</td>
+      </tr>
+      <tr>
+        <td><strong>Workstream A</strong></td>
+        <td>Inny harmonogram LR (cosine, więcej epok)</td>
+        <td>69.02 / 29.56</td>
+        <td>47.10 / 14.98</td>
+        <td class="down">Pogorszenie — odrzucone</td>
+      </tr>
+      <tr>
+        <td><strong>Workstream B</strong></td>
+        <td>Implementacja readoutu + pierwszy pełny run</td>
+        <td>70.36 / 30.94</td>
+        <td>50.36 / 16.83</td>
+        <td>Lekka poprawa vs baseline</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 2B</strong> (sweep)</td>
+        <td>8 wariantów architektury — tylko Yoochoose; najlepszy: <code>ratio=0.7</code></td>
+        <td><strong>70.42 / 31.16</strong></td>
+        <td>—</td>
+        <td class="up">Najlepszy SAGPool na Yoochoose</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 3C</strong> (sweep)</td>
+        <td>Regularyzacja — tylko Diginetica (pojedyncze warianty)</td>
+        <td>—</td>
+        <td>~49–50 / ~16.2–16.6</td>
+        <td>Bez przełomu; combo / label smoothing — błąd runu</td>
+      </tr>
+      <tr>
+        <td><strong>Run 1</strong></td>
+        <td>ratio=0.7 + 2 warstwy GAT, oba datasety</td>
+        <td>70.18 / 31.01</td>
+        <td><strong>50.47 / 16.85</strong></td>
+        <td>Diginetica: najlepszy pełny run; Yoo: gorszy niż sam ratio=0.7 ze sweepu</td>
+      </tr>
+      <tr>
+        <td><strong>Run 2</strong></td>
+        <td>Run 1 + regularyzacja tylko na Diginetica (dropout, emb. dropout, wd)</td>
+        <td>70.27 / 31.08</td>
+        <td>48.77 / 15.86</td>
+        <td class="down">Diginetica gorzej; Run 2 odrzucony</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <img src="report-assets/sagpool/sagpool_phases_yoochoose_164.png" alt="Fazy SAGPool Yoochoose">
+    <figcaption>Rys. 3 — Yoochoose: kolejne fazy vs linie TAGNN z papieru (przerywane). Widać spadek po Workstream A i powrót blisko baseline’ów po Phase 2B / Run 1.</figcaption>
+  </figure>
+  <figure>
+    <img src="report-assets/sagpool/sagpool_phases_diginetica.png" alt="Fazy SAGPool Diginetica">
+    <figcaption>Rys. 4 — Diginetica: Run 1 najlepszy dla SAGPool; Run 2 (regularyzacja) wyraźnie poniżej. TAGNN z papieru (~51.3 / 17.35) nadal poza zasięgiem.</figcaption>
+  </figure>
+
+  <h3>Phase 2B — szczegóły (architektura, Yoochoose)</h3>
+  <p>Testowaliśmy m.in.: głębszy GAT (2 warstwy), więcej głów uwagi, hierarchiczny SAGPool (2 bloki), różne <code>ratio</code>, scorer GAT zamiast GraphConv, większy hidden, gated readout.</p>
+  <ul>
+    <li><strong>Zysk:</strong> <code>ratio=0.7</code> — mniej agresywne obcinanie węzłów (+0.38 P@20 vs baseline).</li>
+    <li><strong>Neutralne:</strong> 2 bloki SAGPool, 2 warstwy GAT — marginalnie.</li>
+    <li><strong>Strata:</strong> hidden=128 — gorzej na teście.</li>
+  </ul>
+  <figure>
+    <img src="report-assets/sagpool/phase2b_sweep_yoochoose.png" alt="Phase 2B sweep">
+    <figcaption>Rys. 5 — wszystkie warianty Phase 2B na Yoochoose; <code>b4_ratio07</code> na szczycie.</figcaption>
+  </figure>
+
+  <h3>Phase 3C — regularyzacja (Diginetica)</h3>
+  <p>Cel: zmniejszyć overfit (walidacja ~19.3 MRR, test ~16.8). Pojedyncze techniki (dropout, edge dropout, weight decay) <strong>nie poprawiły</strong> testu względem Run 1; połączenie w Run 2 <strong>pogorszyło</strong>.</p>
+  <figure>
+    <img src="report-assets/sagpool/phase3c_sweep_diginetica.png" alt="Phase 3C sweep">
+    <figcaption>Rys. 6 — Phase 3C: żaden wariant nie zbliżył się do Run 1 ani TAGNN.</figcaption>
+  </figure>
+
+  <h3>Run 1 vs Run 2</h3>
+  <figure>
+    <img src="report-assets/sagpool/run1_vs_run2_diginetica.png" alt="Run1 vs Run2 Diginetica">
+    <figcaption>Rys. 7 — Diginetica: Run 2 (~−1.7 P@20, ~−1.0 MRR) — regularyzacja nie pomogła.</figcaption>
+  </figure>
+  <figure>
+    <img src="results-sagpool-run1/gat_sagpool_v2_metrics.png" alt="Metryki Run 1">
+    <figcaption>Rys. 8 — krzywe treningu Run 1 (<code>gat_sagpool_v2</code>): walidacja vs epoki.</figcaption>
+  </figure>
+  <figure>
+    <img src="results-sagpool-run2/gat_sagpool_v2_digi_reg_metrics.png" alt="Metryki Run 2">
+    <figcaption>Rys. 9 — krzywe treningu Run 2 (<code>gat_sagpool_v2_digi_reg</code>).</figcaption>
+  </figure>
+</section>
+
+<!-- 6 -->
+<section id="wyniki">
+  <h2>6. Wyniki końcowe — najlepszy SAGPool vs reszta</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Dataset</th>
+        <th>P@20</th>
+        <th>MRR@20</th>
+        <th>Uwagi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>SR-GNN (paper)</td><td>Yoochoose</td><td>70.57</td><td>30.94</td><td>literatura</td></tr>
+      <tr><td>TAGNN (paper)</td><td>Yoochoose</td><td>71.02</td><td>31.12</td><td>literatura</td></tr>
+      <tr><td>GAT-SR-GNN (nasz)</td><td>Yoochoose</td><td>70.12</td><td><strong>31.15</strong></td><td>readout SR-GNN + GAT</td></tr>
+      <tr><td>GAT-TAGNN (nasz)</td><td>Yoochoose</td><td><strong>70.61</strong></td><td>31.00</td><td>readout TAGNN + GAT</td></tr>
+      <tr><td><strong>GAT-SAGPool (best)</strong></td><td>Yoochoose</td><td>70.42</td><td>31.16</td><td>sweep ratio=0.7</td></tr>
+      <tr><td colspan="5"></td></tr>
+      <tr><td>SR-GNN (paper)</td><td>Diginetica</td><td>50.73</td><td>17.59</td><td>literatura</td></tr>
+      <tr><td>TAGNN (paper)</td><td>Diginetica</td><td>51.31</td><td>18.03</td><td>literatura</td></tr>
+      <tr><td>GAT-SR-GNN (nasz)</td><td>Diginetica</td><td>50.25</td><td>16.65</td><td></td></tr>
+      <tr><td>GAT-TAGNN (nasz)</td><td>Diginetica</td><td><strong>51.25</strong></td><td><strong>17.35</strong></td><td>najlepszy u nas</td></tr>
+      <tr><td><strong>GAT-SAGPool (best)</strong></td><td>Diginetica</td><td>50.47</td><td>16.85</td><td>Run 1</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Podsumowanie liczb:</strong> na Yoochoose SAGPool jest <em>blisko</em> wyników z papierów i naszych GAT-SR-GNN / GAT-TAGNN (różnice rzędu 0.2–0.6 pkt). Na Diginetica <strong>GAT-TAGNN</strong> jest najbliżej literatury; SAGPool zostaje ~0.8–1.5 pkt za TAGNN. <strong>Nie pobiliśmy</strong> wyników referencyjnych — ale nie jesteśmy daleko na łatwiejszym zbiorze.</p>
+</section>
+
+<!-- 7 -->
+<section id="wnioski">
+  <h2>7. Wnioski</h2>
+  <ol>
+    <li><strong>GAT-SAGPool to sensowna, autorska trzecia ścieżka</strong> — ten sam graf i GAT co w pozostałych notebookach, inny readout oparty o wybór ważnych węzłów (SAGPool).</li>
+    <li><strong>Readout ma duże znaczenie.</strong> TAGNN (uwaga zależna od kandydata) wygrywa na Diginetica. SAGPool bez target-aware mechanizmu ma trudniej na trudniejszym zbiorze.</li>
+    <li><strong>Najważniejsza poprawka architektury:</strong> <code>sagpool_ratio=0.7</code> (mniej obcinania węzłów niż 0.5). Głębszy GAT (2 warstwy) w pełnym runie nie powtórzył najlepszego wyniku ze sweepu.</li>
+    <li><strong>Regularyzacja (Run 2) na Diginetica nie pomogła</strong> — test spadł. Plan GPU dla SAGPool zamknięty po Run 1 + Run 2.</li>
+    <li><strong>Cel „pobić TAGNN i SR-GNN” nie został spełniony</strong>, ale na Yoochoose jesteśmy w tym samym przedziale co modele z literatury — co uzasadnia wniosek, że GAT + sensowny readout daje wyniki porównywalne, a wybór readoutu warto badać dalej.</li>
+    <li>Do prezentacji / pracy cytuj: <strong>Yoochoose</strong> — SAGPool 70.42 / 31.16 (Phase 2B); <strong>Diginetica</strong> — SAGPool 50.47 / 16.85 (Run 1). Porównanie z GAT-TAGNN: 51.25 / 17.35.</li>
+  </ol>
+</section>
+
+</main>
+
+<footer>
+  <p>Notebook: <code>gat_sagpool_architecture.ipynb</code> · Wykresy: <code>python scripts/generate_sagpool_report_charts.py</code> → <code>report-assets/sagpool/</code></p>
+  <p>Projekt: Session-based Recommendation with Graph Attention Networks</p>
+</footer>
+
+</body>
+</html>
