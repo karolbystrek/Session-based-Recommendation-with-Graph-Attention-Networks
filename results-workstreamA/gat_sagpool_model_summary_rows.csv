@@ -1,0 +1,3 @@
+model,dataset,test_precision@20,test_mrr@20,test_loss,best_epoch,best_validation_precision@20,best_validation_mrr@20,train_examples,validation_examples,test_examples,num_items,checkpoint_path
+GAT-SAGPool,Yoochoose 1/64,69.02214748291532,29.556702653036684,4.434746200392006,6,67.97350277139381,31.20734355184409,332874,36985,55898,37484,/kaggle/working/results/checkpoints/gat_sagpool_yoochoose_1_64.pt
+GAT-SAGPool,Diginetica,47.10473561405239,14.983549206266817,5.7173776480538,4,52.04247571128747,17.572773921706272,647523,71947,60858,43098,/kaggle/working/results/checkpoints/gat_sagpool_diginetica.pt
