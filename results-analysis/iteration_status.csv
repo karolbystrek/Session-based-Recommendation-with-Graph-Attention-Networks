@@ -7,3 +7,4 @@ iteration,folder,GAT-SR-GNN status,GAT-TAGNN status,What Changed
 6,results-6,trained,trained,"Shared GAT-only recovery iteration with repeated transition edges by default, no scalar edge_attr, GATv2Conv, plain residual and one layer; SR-GNN/TAGNN readouts unchanged."
 7,results-7,trained,trained,"GAT-only identity-preserving fusion: same iteration-6 GATv2 stack, then add original item embedding after direction fusion; SR-GNN/TAGNN readouts unchanged."
 8,results-8,trained,trained,Restored iteration-1 weighted GATConv(edge_dim=1) architecture from commit 7bff12d with mild dropout 0.15; both direct branches trained in results-8.
+9,results-9,trained,trained,"Same weighted GATConv(edge_dim=1) architecture as iteration 8, but uses dropout 0.10 plus small label smoothing 0.01 via r5_restored_baseline_label_smoothing; both direct branches trained in results-9."

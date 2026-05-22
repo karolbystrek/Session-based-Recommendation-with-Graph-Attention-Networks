@@ -1,4 +1,5 @@
 .venv/
+.cursor/
 .DS_Store
 __pycache__/
 data/raw/
