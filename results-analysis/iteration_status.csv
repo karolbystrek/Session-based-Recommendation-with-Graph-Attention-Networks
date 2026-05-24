@@ -3,8 +3,9 @@ iteration,folder,GAT-SR-GNN status,GAT-TAGNN status,What Changed
 2,results-2,trained,pending,Simplified GAT stack revision; only GAT-SR-GNN was rerun in this export.
 3,results-3,trained,trained,"GATv2/performance iteration, including TAGNN scoring/chunking changes and SR-GNN positional-embedding rollback."
 4,results-4,trained,pending,Repeated transition edges plus explicit residual connections in the GAT stack; TAGNN still pending.
-5,results-5,trained,trained,Failed edge-attribute/gated-normalization ablation: normalized edge_attr for GATv2Conv(edge_dim=1) with gated residual blending and LayerNorm per directional GAT stack; hidden_dim remains 100.
-6,results-6,trained,trained,"Shared GAT-only recovery iteration with repeated transition edges by default, no scalar edge_attr, GATv2Conv, plain residual and one layer; SR-GNN/TAGNN readouts unchanged."
-7,results-7,trained,trained,"GAT-only identity-preserving fusion: same iteration-6 GATv2 stack, then add original item embedding after direction fusion; SR-GNN/TAGNN readouts unchanged."
-8,results-8,trained,trained,Restored iteration-1 weighted GATConv(edge_dim=1) architecture from commit 7bff12d with mild dropout 0.15; both direct branches trained in results-8.
-9,results-9,trained,trained,"Same weighted GATConv(edge_dim=1) architecture as iteration 8, but uses dropout 0.10 plus small label smoothing 0.01 via r5_restored_baseline_label_smoothing; both direct branches trained in results-9."
+5,results-5,trained,trained,Failed edge-attribute/gated-normalization ablation: normalized edge_attr for GATv2Conv(edge_dim=1) with gated residual blending and LayerNorm in each directional GAT stack.
+6,results-6,trained,trained,"Shared GAT-only recovery iteration: repeated transition edges by default, no scalar edge_attr, GATv2Conv, plain residual, one layer; SR-GNN/TAGNN readouts unchanged."
+7,results-7,trained,trained,"GAT-only identity-preserving fusion: same iteration-6 GATv2 stack, then add original item embedding after direction fusion; readouts unchanged."
+8,results-8,trained,trained,Restored iteration-1 weighted GATConv(edge_dim=1) architecture from commit 7bff12d; first regularization test uses mild dropout 0.15 with no LayerNorm/gating/identity skip.
+9,results-9,trained,trained,"Same weighted GATConv(edge_dim=1) architecture as iteration 8, but uses dropout 0.10 plus small label smoothing 0.01 via r5_restored_baseline_label_smoothing."
+10,results-10,trained,trained,"GAT-only edge-feature expansion: aggregated transitions now pass transition probability, repeat strength, and recency to GATConv(edge_dim=3) with split attention dropout 0.05 and feature dropout 0.10; readouts unchanged."

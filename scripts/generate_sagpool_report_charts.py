@@ -10,6 +10,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,15 +32,15 @@ PAPER = {
     },
 }
 
-# Our GAT reimplementations (results-1).
+# Selected direct GAT reimplementations (results-10).
 GAT_BASELINES = {
     "Yoochoose 1/64": {
-        "GAT-SR-GNN": (70.124, 31.146),
-        "GAT-TAGNN": (70.611, 31.004),
+        "GAT-SR-GNN": (70.047, 31.097),
+        "GAT-TAGNN": (70.888, 31.187),
     },
     "Diginetica": {
-        "GAT-SR-GNN": (50.250, 16.646),
-        "GAT-TAGNN": (51.252, 17.353),
+        "GAT-SR-GNN": (50.427, 16.688),
+        "GAT-TAGNN": (51.362, 17.451),
     },
 }
 
@@ -49,6 +52,7 @@ SAGPOOL_PHASES = {
         ("Phase 2B best (ratio=0.7)", 70.42, 31.16),
         ("Run 1 (v2)", 70.18, 31.01),
         ("Run 2 (digi reg)", 70.27, 31.08),
+        ("Newest shared-edge GAT", 70.49, 31.16),
     ],
     "Diginetica": [
         ("Baseline SAGPool", 50.28, 16.66),
@@ -56,6 +60,7 @@ SAGPOOL_PHASES = {
         ("Workstream B", 50.36, 16.83),
         ("Run 1 (v2)", 50.47, 16.85),
         ("Run 2 (digi reg)", 48.77, 15.86),
+        ("Newest shared-edge GAT", 48.93, 16.27),
     ],
 }
 
@@ -149,7 +154,7 @@ def chart_three_models_vs_paper():
         # Best SAGPool per dataset
         if dataset == "Yoochoose 1/64":
             labels.append("GAT-SAGPool (best)")
-            p20.append(70.42)
+            p20.append(70.49)
             mrr.append(31.16)
         else:
             labels.append("GAT-SAGPool (best)")
@@ -220,18 +225,25 @@ def chart_phase3c():
 
 
 def chart_run1_vs_run2():
-    labels = ["Run 1 (v2)", "Run 2 (reg Diginetica)"]
-    for dataset, r1, r2 in [
-        ("Yoochoose 1/64", (70.18, 31.01), (70.27, 31.08)),
-        ("Diginetica", (50.47, 16.85), (48.77, 15.86)),
+    labels = ["Run 1 (v2)", "Run 2 (reg Diginetica)", "Newest shared-edge GAT"]
+    for dataset, r1, r2, newest in [
+        ("Yoochoose 1/64", (70.18, 31.01), (70.27, 31.08), (70.49, 31.16)),
+        ("Diginetica", (50.47, 16.85), (48.77, 15.86), (48.93, 16.27)),
     ]:
-        p20 = [r1[0], r2[0]]
-        mrr = [r1[1], r2[1]]
-        colors = [COLORS["best"], COLORS["worse"]]
+        p20 = [r1[0], r2[0], newest[0]]
+        mrr = [r1[1], r2[1], newest[1]]
+        colors = [COLORS["best"], COLORS["worse"], COLORS["sagpool"]]
         safe = dataset.lower().replace(" ", "_").replace("/", "")
         _bar_chart(
             labels, p20, mrr,
-            f"Run 1 vs Run 2 — {dataset}",
+            f"Run 1 vs Run 2 vs Newest — {dataset}",
+            f"run1_vs_run2_vs_newest_{safe}.png",
+            colors=colors,
+            rotate=0,
+        )
+        _bar_chart(
+            labels, p20, mrr,
+            f"Run 1 vs Run 2 vs Newest — {dataset}",
             f"run1_vs_run2_{safe}.png",
             colors=colors,
             rotate=0,
