@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GAT for Session-Based Recommendation</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --ink: #17202a;
+      --muted: #59636f;
+      --line: #d9dee6;
+      --blue: #1f77b4;
+      --green: #2ca02c;
+      --orange: #d95f02;
+      --red: #c44e52;
+      --paper: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      padding: clamp(28px, 4vw, 58px);
+      background: var(--paper);
+      position: absolute;
+      inset: 0;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .slide.compact {
+      gap: 18px;
+    }
+
+    .slide.plot-slide.active {
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: clamp(14px, 1.3vw, 18px);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 1100px;
+      font-size: clamp(44px, 6vw, 84px);
+    }
+
+    h2 {
+      font-size: clamp(34px, 4.2vw, 62px);
+    }
+
+    h3 {
+      margin: 0;
+      font-size: clamp(20px, 2vw, 28px);
+    }
+
+    p,
+    li {
+      font-size: clamp(18px, 1.75vw, 27px);
+      line-height: 1.35;
+    }
+
+    p {
+      max-width: 1040px;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.1em;
+    }
+
+    li + li {
+      margin-top: 10px;
+    }
+
+    .title-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      color: var(--muted);
+      font-size: clamp(17px, 1.4vw, 22px);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 34px;
+      align-items: center;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: #fbfcfe;
+    }
+
+    .panel p,
+    .panel li {
+      font-size: clamp(16px, 1.35vw, 22px);
+    }
+
+    .panel h3 {
+      margin-bottom: 12px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      align-items: center;
+    }
+
+    .flow-step {
+      min-height: 106px;
+      border: 2px solid var(--line);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: clamp(16px, 1.35vw, 22px);
+      font-weight: 700;
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 28px;
+    }
+
+    .graph-demo {
+      width: min(640px, 100%);
+      aspect-ratio: 16 / 9;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .metric {
+      border-left: 6px solid var(--blue);
+      padding: 16px 18px;
+      background: #f8fafc;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: clamp(24px, 2.6vw, 38px);
+      line-height: 1.05;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: clamp(14px, 1.1vw, 18px);
+    }
+
+    .chart {
+      max-width: 100%;
+      max-height: 68vh;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .chart.tall {
+      max-height: 76vh;
+    }
+
+    .plot-slide .chart {
+      width: auto;
+      height: calc(100vh - 178px);
+      max-width: calc(100vw - 96px);
+      max-height: none;
+      object-fit: contain;
+    }
+
+    .plot-slide h2 {
+      text-align: center;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: clamp(14px, 1.05vw, 18px);
+      line-height: 1.35;
+    }
+
+    .tag {
+      display: inline-block;
+      color: #fff;
+      background: var(--blue);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: clamp(13px, 1vw, 16px);
+      font-weight: 700;
+    }
+
+    .citation {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      margin-top: 10px;
+      color: var(--muted);
+      background: #eef2f7;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: clamp(13px, 1vw, 16px);
+      font-weight: 700;
+      text-decoration: none;
+      line-height: 1.15;
+    }
+
+    .citation.inline {
+      margin-top: 0;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    .citation:hover {
+      color: var(--blue);
+      border-color: var(--blue);
+      background: #f8fbff;
+    }
+
+    .citation span {
+      color: var(--blue);
+    }
+
+    .accent-blue {
+      color: var(--blue);
+    }
+
+    .accent-green {
+      color: var(--green);
+    }
+
+    .accent-orange {
+      color: var(--orange);
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      height: 5px;
+      width: 100%;
+      background: #e4e8ef;
+      z-index: 10;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: var(--blue);
+      transition: width 160ms ease;
+    }
+
+    .counter {
+      position: fixed;
+      right: 20px;
+      bottom: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      z-index: 11;
+    }
+
+    @media (max-width: 900px) {
+      .two-col,
+      .three-col,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+      }
+
+      .slide {
+        overflow-y: auto;
+      }
+
+      .slide.active {
+        justify-content: flex-start;
+      }
+    }
+
+    @media print {
+      body,
+      .deck {
+        width: auto;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .slide,
+      .slide.active {
+        display: flex;
+        position: static;
+        width: 100vw;
+        height: 100vh;
+        page-break-after: always;
+      }
+
+      .progress,
+      .counter {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide active">
+      <div class="eyebrow">Study presentation</div>
+      <h1>Graph Attention Networks for Session-Based Recommendation</h1>
+      <p>Investigating whether GAT encoders can replace GGNN propagation in graph-based next-item recommendation.</p>
+      <div class="title-meta">
+        <span>Datasets: Yoochoose 1/64 and Diginetica</span>
+        <span>Metrics: Precision@20 and MRR@20</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Problem</div>
+      <h2>Predict the next item in a short anonymous session</h2>
+      <div class="flow">
+        <div class="flow-step">phone</div>
+        <div class="arrow">-></div>
+        <div class="flow-step">case</div>
+        <div class="arrow">-></div>
+        <div class="flow-step">charger ?</div>
+      </div>
+      <p>In session-based recommendation, the system does not know who the user is or what they usually like. It only sees the current click sequence and must produce a ranked list of items that are likely to be clicked next.</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Why it is hard</div>
+      <h2>Short sessions contain weak, noisy signals</h2>
+      <div class="three-col">
+        <div class="panel">
+          <h3>No stable profile</h3>
+          <p>The same person may appear as a new anonymous session, so the model cannot depend on long-term history.</p>
+        </div>
+        <div class="panel">
+          <h3>Order matters</h3>
+          <p>A recent click can be more important than an older one because it often reflects the current intent.</p>
+        </div>
+        <div class="panel">
+          <h3>Not all clicks matter</h3>
+          <p>Some transitions are accidental or weak. A useful model should learn which item relations are important.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Graph view</div>
+      <h2>Represent the session as an item-transition graph</h2>
+      <div class="two-col">
+        <svg class="graph-demo" viewBox="0 0 640 360" role="img" aria-label="Session graph example">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#59636f"></path>
+            </marker>
+          </defs>
+          <line x1="145" y1="170" x2="270" y2="110" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
+          <line x1="315" y1="130" x2="430" y2="185" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
+          <line x1="430" y1="220" x2="260" y2="250" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
+          <line x1="230" y1="250" x2="130" y2="195" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
+          <circle cx="115" cy="180" r="48" fill="#1f77b4"></circle>
+          <circle cx="310" cy="105" r="48" fill="#2ca02c"></circle>
+          <circle cx="470" cy="205" r="48" fill="#d95f02"></circle>
+          <circle cx="230" cy="260" r="48" fill="#8c8c8c"></circle>
+          <text x="115" y="188" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">A</text>
+          <text x="310" y="113" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">B</text>
+          <text x="470" y="213" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">C</text>
+          <text x="230" y="268" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">D</text>
+        </svg>
+        <ul>
+          <li>Nodes are unique items in the session.</li>
+          <li>Directed edges are observed click transitions.</li>
+          <li>Repeated transitions can become stronger edge signals.</li>
+          <li>The graph keeps the order signal while also showing how items are connected inside the session.</li>
+        </ul>
+      </div>
+      <p class="small">A sequence says “what came next.” A graph also lets repeated or connected item transitions influence the learned representation.</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Reference papers</div>
+      <h2>Two graph-based baselines anchor the study</h2>
+      <div class="two-col">
+        <div class="panel">
+          <span class="tag">SR-GNN</span>
+          <a class="citation" href="https://arxiv.org/abs/1811.00855" target="_blank" rel="noopener">Wu et al., 2019 <span>arXiv:1811.00855</span></a>
+          <h3>Local and global session preference</h3>
+          <p>Builds item embeddings with GGNN propagation, then combines the last clicked item with an attention-weighted summary of the whole session.</p>
+        </div>
+        <div class="panel">
+          <span class="tag">TAGNN</span>
+          <a class="citation" href="https://arxiv.org/abs/2005.02844" target="_blank" rel="noopener">Yu et al., 2020 <span>arXiv:2005.02844</span></a>
+          <h3>Target-aware session preference</h3>
+          <p>Also starts with graph propagation, but changes the session representation for each candidate item being scored.</p>
+        </div>
+      </div>
+      <p class="small">Both papers use graph-based session modeling. This study keeps their high-level idea and replaces the graph encoder with GAT.</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Research question</div>
+      <h2>What happens if GGNN propagation is replaced by GAT?</h2>
+      <ul>
+        <li>Does attention-based graph encoding improve next-item recommendation?</li>
+        <li>Does the effect depend on the readout after graph encoding?</li>
+        <li>Can a fully attention-based GAT + SAGPool design compete with the reference architectures?</li>
+      </ul>
+      <p class="small">The key point is controlled comparison: change the graph encoder, keep the task, datasets, and evaluation metrics aligned with the papers.</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">GAT intuition</div>
+      <h2>GAT learns which neighboring items deserve more attention <a class="citation inline" href="https://arxiv.org/abs/1710.10903" target="_blank" rel="noopener">Velickovic et al., 2018 <span>arXiv:1710.10903</span></a></h2>
+      <div class="two-col">
+        <div class="panel">
+          <h3>GGNN-style propagation</h3>
+          <p>Messages are passed through graph edges using recurrent gated updates.</p>
+        </div>
+        <div class="panel">
+          <h3>GAT-style propagation</h3>
+          <p>Messages are still passed through graph edges, but the model learns attention weights over neighboring items.</p>
+        </div>
+      </div>
+      <p>The practical hypothesis: attention can focus an item embedding on the most useful neighboring clicks instead of treating every transition as equally useful.</p>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Final architecture</div>
+      <h2>Shared GAT encoder used by the final models</h2>
+      <div class="two-col">
+        <div class="panel">
+          <h3>Encoder design</h3>
+          <ul>
+            <li>One node per unique session item</li>
+            <li>Forward and backward transition channels</li>
+            <li>One `GATConv` layer per direction</li>
+            <li>4 attention heads, hidden size 100</li>
+            <li>Plain residual update after GAT</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Edge features</h3>
+          <ul>
+            <li>Transition probability</li>
+            <li>Repeat strength</li>
+            <li>Recency</li>
+            <li>`edge_dim=3`</li>
+            <li>Attention dropout 0.05, feature dropout 0.10</li>
+          </ul>
+        </div>
+      </div>
+      <p class="small">The same GAT encoder is shared by the final SR-GNN-style and TAGNN-style branches, which makes their readout comparison easier to interpret.</p>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">SAGPool concept</div>
+      <h2>SAGPool summarizes a graph by keeping its most important nodes <a class="citation inline" href="https://arxiv.org/abs/1904.08082" target="_blank" rel="noopener">Lee et al., 2019 <span>arXiv:1904.08082</span></a></h2>
+      <div class="two-col">
+        <div class="panel">
+          <h3>What it does</h3>
+          <ul>
+            <li>Assigns an importance score to each node in the session graph.</li>
+            <li>Keeps only the top-scoring nodes.</li>
+            <li>Aggregates the remaining nodes into one graph-level session representation.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Why test it here</h3>
+          <ul>
+            <li>SR-GNN and TAGNN are established graph-session architectures.</li>
+            <li>SAGPool gives a different way to turn item nodes into a session vector.</li>
+            <li>It lets us test a more fully attention-based pipeline: GAT for encoding, SAGPool for summarization.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="small">In this study, SAGPool is exploratory. It is not a direct reproduction of SR-GNN or TAGNN, but a third branch that asks whether attention-based graph pooling can compete with their hand-designed session readouts.</p>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Model variants</div>
+      <h2>Three readouts test where GAT helps</h2>
+      <div class="three-col">
+        <div class="panel">
+          <h3 class="accent-blue">GAT-SR-GNN</h3>
+          <p>GAT encoder with SR-GNN-style local plus global session readout.</p>
+        </div>
+        <div class="panel">
+          <h3 class="accent-green">GAT-TAGNN</h3>
+          <p>GAT encoder with target-aware readout, so the session vector depends on each candidate.</p>
+        </div>
+        <div class="panel">
+          <h3 class="accent-orange">GAT-SAGPool</h3>
+          <p>GAT encoder with self-attention graph pooling and explicit last-click preservation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Experimental setup</div>
+      <h2>Evaluation follows the reference studies</h2>
+      <div class="metric-grid">
+        <div class="metric">
+          <strong>2</strong>
+          <span>Datasets: Yoochoose 1/64 and Diginetica</span>
+        </div>
+        <div class="metric">
+          <strong>Top-20</strong>
+          <span>The model returns 20 recommended items for each session prefix</span>
+        </div>
+        <div class="metric">
+          <strong>P@20</strong>
+          <span>Target appears in the top 20</span>
+        </div>
+        <div class="metric">
+          <strong>MRR@20</strong>
+          <span>Target rank quality inside the top 20</span>
+        </div>
+      </div>
+      <p>For each test example, the model scores candidate items and sorts them from most to least likely. Precision@20 asks whether the true next item is anywhere in the top 20; MRR@20 also rewards placing it near the top of that list.</p>
+      <p class="small">Sessions shorter than two interactions and rare items are filtered, then each session is converted into prefix-target examples for next-item prediction.</p>
+    </section>
+
+    <section class="slide plot-slide">
+      <div class="eyebrow">Model progression</div>
+      <h2>Precision@20 across model iterations</h2>
+      <img class="chart" src="presentation-assets/precision_progression.png" alt="Precision@20 progression for all GAT model iterations">
+    </section>
+
+    <section class="slide plot-slide">
+      <div class="eyebrow">Model progression</div>
+      <h2>MRR@20 across model iterations</h2>
+      <img class="chart" src="presentation-assets/mrr_progression.png" alt="MRR@20 progression for all GAT model iterations">
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Progression summary</div>
+      <h2>Design changes became simpler after failed complex variants</h2>
+      <ul>
+        <li>Iteration 1 established the first complete GAT replacement for SR-GNN and TAGNN.</li>
+        <li>Iteration 5 added gated normalization and edge-attribute changes, but performance dropped.</li>
+        <li>Iteration 8 restored the stronger weighted `GATConv` design.</li>
+        <li>Iteration 10 kept the readouts fixed and added three interpretable edge features: probability, repeat strength, and recency.</li>
+      </ul>
+    </section>
+
+    <section class="slide plot-slide">
+      <div class="eyebrow">Main comparison</div>
+      <h2>Paper baselines and final GAT architectures side by side</h2>
+      <img class="chart" src="presentation-assets/main_results_2x2.png" alt="Published paper results and final GAT architectures across both datasets and metrics">
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Main comparison</div>
+      <h2>What the result chart shows</h2>
+      <ul>
+        <li>The main comparison uses iteration 10 for GAT-SR-GNN and GAT-TAGNN, and `results-newest` for GAT-SAGPool.</li>
+        <li>Precision@20 and MRR@20 should be read together: one measures hit rate, the other measures rank quality.</li>
+        <li>GAT-TAGNN is the most competitive final GAT variant across the two datasets.</li>
+        <li>SAGPool is a useful exploratory branch, but it does not consistently beat the established readouts.</li>
+      </ul>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Result selection</div>
+      <h2>Use final selected architectures for the main story</h2>
+      <ul>
+        <li>Presenting one final architecture per model avoids cherry-picking different historical runs.</li>
+        <li>Use iteration 10 for GAT-SR-GNN and GAT-TAGNN because both share the same final GAT encoder.</li>
+        <li>Use `results-newest` for GAT-SAGPool when presenting the final shared-edge SAGPool variant.</li>
+        <li>Historical best rows belong in the progression discussion, not the headline comparison.</li>
+      </ul>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Interpretation</div>
+      <h2>GAT helps most when the readout is target-aware</h2>
+      <ul>
+        <li>GAT-TAGNN is the strongest final GAT branch overall.</li>
+        <li>It slightly exceeds TAGNN paper Precision@20 on Diginetica and MRR@20 on Yoochoose.</li>
+        <li>GAT-SR-GNN remains close to SR-GNN, but it does not clearly improve the original paper baseline.</li>
+        <li>GAT-SAGPool is competitive on Yoochoose, but weaker on Diginetica in the final run.</li>
+      </ul>
+      <p class="small">This suggests that better graph encoding is useful, but the downstream session representation controls how much of that signal reaches the final ranking.</p>
+    </section>
+
+    <section class="slide">
+      <div class="eyebrow">Conclusions</div>
+      <h2>Main takeaways</h2>
+      <ul>
+        <li>Replacing GGNN with GAT is feasible in graph-based session recommendation.</li>
+        <li>The encoder alone is not the full answer: readout design strongly controls the outcome.</li>
+        <li>The best final direction is GAT encoding paired with TAGNN-style target-aware scoring.</li>
+        <li>More attention components do not automatically improve results, as SAGPool shows.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <div class="progress" aria-hidden="true"><div class="progress-bar"></div></div>
+  <div class="counter" aria-hidden="true"></div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const bar = document.querySelector(".progress-bar");
+    const counter = document.querySelector(".counter");
+    let index = Number(new URLSearchParams(window.location.search).get("slide") || 1) - 1;
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function show(nextIndex) {
+      index = clamp(nextIndex, 0, slides.length - 1);
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("active", slideIndex === index);
+      });
+      bar.style.width = `${((index + 1) / slides.length) * 100}%`;
+      counter.textContent = `${index + 1} / ${slides.length}`;
+      history.replaceState(null, "", `?slide=${index + 1}`);
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) {
+        event.preventDefault();
+        show(index + 1);
+      }
+      if (["ArrowLeft", "PageUp", "Backspace"].includes(event.key)) {
+        event.preventDefault();
+        show(index - 1);
+      }
+      if (event.key === "Home") {
+        show(0);
+      }
+      if (event.key === "End") {
+        show(slides.length - 1);
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const midpoint = window.innerWidth / 2;
+      show(event.clientX >= midpoint ? index + 1 : index - 1);
+    });
+
+    show(index);
+  </script>
+</body>
+</html>
