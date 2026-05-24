@@ -14,6 +14,13 @@ OUT_DIR = ROOT / "presentation-assets"
 
 DATASETS = ["Yoochoose 1/64", "Diginetica"]
 MODEL_ORDER = ["SR-GNN paper", "TAGNN paper", "GAT-SR-GNN", "GAT-TAGNN", "GAT-SAGPool"]
+DISPLAY_LABELS = {
+    "SR-GNN paper": "SR-GNN publikacja",
+    "TAGNN paper": "TAGNN publikacja",
+    "GAT-SR-GNN": "GAT-SR-GNN",
+    "GAT-TAGNN": "GAT-TAGNN",
+    "GAT-SAGPool": "GAT-SAGPool",
+}
 MODEL_COLORS = {
     "SR-GNN paper": "#6f7782",
     "TAGNN paper": "#9aa0a6",
@@ -102,7 +109,8 @@ def plot_main_comparison(data: pd.DataFrame):
             ax = axes[row_idx][col_idx]
             values = dataset_data[metric]
             colors = [MODEL_COLORS[model] for model in MODEL_ORDER]
-            bars = ax.bar(MODEL_ORDER, values, color=colors, width=0.68)
+            labels = [DISPLAY_LABELS[model] for model in MODEL_ORDER]
+            bars = ax.bar(labels, values, color=colors, width=0.68)
             ax.bar_label(bars, fmt="%.2f", padding=3, fontsize=8)
             ax.set_title(f"{dataset} - {title}", fontsize=13, weight="bold")
             ax.set_ylabel(title)
@@ -135,7 +143,7 @@ def plot_iteration_progression(runs: pd.DataFrame, metric: str, label: str, file
                 **style,
             )
         ax.set_title(dataset, fontsize=13, weight="bold")
-        ax.set_xlabel("Iteration / archived run")
+        ax.set_xlabel("Iteracja / zapisany przebieg")
         ax.set_ylabel(label)
         ax.set_xticks(sorted(dataset_runs["iteration"].unique()))
         step = 1.0 if metric == "test_precision@20" else 0.5
@@ -144,7 +152,7 @@ def plot_iteration_progression(runs: pd.DataFrame, metric: str, label: str, file
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.04))
-    fig.suptitle(f"Model Progression by {label}", fontsize=18, weight="bold", y=1.13)
+    fig.suptitle(f"Rozwój modeli według {label}", fontsize=18, weight="bold", y=1.13)
     fig.savefig(OUT_DIR / filename, dpi=180, bbox_inches="tight")
     plt.close(fig)
 
@@ -160,9 +168,10 @@ def plot_final_deltas(data: pd.DataFrame):
         else:
             reference = "SR-GNN paper"
         ref = baseline[(baseline["model"] == reference) & (baseline["dataset"] == row["dataset"])].iloc[0]
+        model_label = DISPLAY_LABELS[row["model"]].replace("GAT-", "")
         rows.append(
             {
-                "label": f"{row['model'].replace('GAT-', '')}\n{row['dataset']}",
+                "label": f"{model_label}\n{row['dataset']}",
                 "precision_delta": row["test_precision@20"] - ref["test_precision@20"],
                 "mrr_delta": row["test_mrr@20"] - ref["test_mrr@20"],
             }
@@ -171,19 +180,19 @@ def plot_final_deltas(data: pd.DataFrame):
     delta = pd.DataFrame(rows)
     fig, axes = plt.subplots(1, 2, figsize=(15, 4.8), constrained_layout=True)
     for ax, metric, title in [
-        (axes[0], "precision_delta", "Precision@20 delta"),
-        (axes[1], "mrr_delta", "MRR@20 delta"),
+        (axes[0], "precision_delta", "Różnica Precision@20"),
+        (axes[1], "mrr_delta", "Różnica MRR@20"),
     ]:
         colors = ["#2ca02c" if value >= 0 else "#c44e52" for value in delta[metric]]
         bars = ax.bar(delta["label"], delta[metric], color=colors, width=0.68)
         ax.axhline(0, color="#202124", linewidth=1)
         ax.bar_label(bars, fmt="%+.2f", padding=3, fontsize=8)
         ax.set_title(title, fontsize=13, weight="bold")
-        ax.set_ylabel("Absolute delta")
+        ax.set_ylabel("Różnica względem punktu odniesienia")
         ax.tick_params(axis="x", labelrotation=20, labelsize=9)
         style_axes(ax)
 
-    fig.suptitle("Final GAT Architectures vs Matching Paper Baseline", fontsize=17, weight="bold")
+    fig.suptitle("Finalne architektury GAT vs odpowiedni wynik z publikacji", fontsize=17, weight="bold")
     fig.savefig(OUT_DIR / "final_deltas.png", dpi=180, bbox_inches="tight")
     plt.close(fig)
 

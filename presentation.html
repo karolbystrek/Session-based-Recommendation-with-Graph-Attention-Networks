@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GAT for Session-Based Recommendation</title>
+  <title>GAT w rekomendacji sesyjnej</title>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -280,6 +280,26 @@
       color: var(--blue);
     }
 
+    .paper-ref {
+      display: block;
+      width: fit-content;
+      margin: 4px 0 14px;
+      color: var(--muted);
+      font-size: clamp(13px, 1vw, 16px);
+      font-weight: 600;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+
+    .paper-ref span {
+      color: var(--blue);
+    }
+
+    .paper-ref:hover {
+      color: var(--blue);
+      text-decoration: underline;
+    }
+
     .accent-blue {
       color: var(--blue);
     }
@@ -370,52 +390,48 @@
 <body>
   <main class="deck" aria-live="polite">
     <section class="slide active">
-      <div class="eyebrow">Study presentation</div>
-      <h1>Graph Attention Networks for Session-Based Recommendation</h1>
-      <p>Investigating whether GAT encoders can replace GGNN propagation in graph-based next-item recommendation.</p>
-      <div class="title-meta">
-        <span>Datasets: Yoochoose 1/64 and Diginetica</span>
-        <span>Metrics: Precision@20 and MRR@20</span>
-      </div>
+      <div class="eyebrow">Prezentacja badania</div>
+      <h1>Session-based Recommendation with Graph Attention Networks</h1>
+      <p>W badaniu sprawdzamy, czy enkoder GAT może zastąpić propagację GGNN (Gated Graph Neural Network) w grafowych modelach predykcji następnego produktu.</p>
     </section>
 
     <section class="slide">
       <div class="eyebrow">Problem</div>
-      <h2>Predict the next item in a short anonymous session</h2>
+      <h2>Przewidzieć następny produkt w krótkiej anonimowej sesji</h2>
       <div class="flow">
-        <div class="flow-step">phone</div>
-        <div class="arrow">-></div>
-        <div class="flow-step">case</div>
-        <div class="arrow">-></div>
-        <div class="flow-step">charger ?</div>
+        <div class="flow-step">telefon</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-step">etui</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-step">ładowarka?</div>
       </div>
-      <p>In session-based recommendation, the system does not know who the user is or what they usually like. It only sees the current click sequence and must produce a ranked list of items that are likely to be clicked next.</p>
+      <p>W rekomendacji sesyjnej system nie zna profilu użytkownika. Widzi tylko bieżącą sekwencję kliknięć i musi ułożyć ranking produktów, które najpewniej zostaną kliknięte jako następne.</p>
     </section>
 
     <section class="slide">
-      <div class="eyebrow">Why it is hard</div>
-      <h2>Short sessions contain weak, noisy signals</h2>
+      <div class="eyebrow">Dlaczego to trudne</div>
+      <h2>Krótkie sesje zawierają słaby i zaszumiony sygnał</h2>
       <div class="three-col">
         <div class="panel">
-          <h3>No stable profile</h3>
-          <p>The same person may appear as a new anonymous session, so the model cannot depend on long-term history.</p>
+          <h3>Brak profilu</h3>
+          <p>Ta sama osoba może pojawić się jako nowa anonimowa sesja, więc model nie może opierać się na długiej historii.</p>
         </div>
         <div class="panel">
-          <h3>Order matters</h3>
-          <p>A recent click can be more important than an older one because it often reflects the current intent.</p>
+          <h3>Kolejność ma znaczenie</h3>
+          <p>Ostatnie kliknięcie często lepiej opisuje bieżącą intencję niż starsze elementy sesji.</p>
         </div>
         <div class="panel">
-          <h3>Not all clicks matter</h3>
-          <p>Some transitions are accidental or weak. A useful model should learn which item relations are important.</p>
+          <h3>Nie każde kliknięcie jest ważne</h3>
+          <p>Część przejść jest przypadkowa lub mało informacyjna. Model powinien nauczyć się, które relacje między produktami są istotne.</p>
         </div>
       </div>
     </section>
 
     <section class="slide">
-      <div class="eyebrow">Graph view</div>
-      <h2>Represent the session as an item-transition graph</h2>
+      <div class="eyebrow">Reprezentacja grafowa</div>
+      <h2>Sesję można zapisać jako graf przejść między produktami</h2>
       <div class="two-col">
-        <svg class="graph-demo" viewBox="0 0 640 360" role="img" aria-label="Session graph example">
+        <svg class="graph-demo" viewBox="0 0 640 360" role="img" aria-label="Przykład grafu sesji">
           <defs>
             <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
               <path d="M0,0 L0,6 L9,3 z" fill="#59636f"></path>
@@ -435,229 +451,222 @@
           <text x="230" y="268" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">D</text>
         </svg>
         <ul>
-          <li>Nodes are unique items in the session.</li>
-          <li>Directed edges are observed click transitions.</li>
-          <li>Repeated transitions can become stronger edge signals.</li>
-          <li>The graph keeps the order signal while also showing how items are connected inside the session.</li>
+          <li>Węzły to unikalne produkty występujące w sesji.</li>
+          <li>Skierowane krawędzie oznaczają zaobserwowane przejścia kliknięć.</li>
+          <li>Powtarzające się przejścia mogą wzmacniać sygnał krawędzi.</li>
+          <li>Graf zachowuje kolejność, ale pokazuje też strukturę powiązań wewnątrz sesji.</li>
         </ul>
       </div>
-      <p class="small">A sequence says “what came next.” A graph also lets repeated or connected item transitions influence the learned representation.</p>
+      <p class="small">Sekwencja mówi, co wystąpiło po czym. Graf pozwala dodatkowo wykorzystać powtarzalność i relacje między klikniętymi produktami.</p>
     </section>
 
     <section class="slide">
-      <div class="eyebrow">Reference papers</div>
-      <h2>Two graph-based baselines anchor the study</h2>
+      <div class="eyebrow">Modele odniesienia</div>
+      <h2>Badanie opiera się na dwóch grafowych architekturach</h2>
       <div class="two-col">
         <div class="panel">
           <span class="tag">SR-GNN</span>
-          <a class="citation" href="https://arxiv.org/abs/1811.00855" target="_blank" rel="noopener">Wu et al., 2019 <span>arXiv:1811.00855</span></a>
-          <h3>Local and global session preference</h3>
-          <p>Builds item embeddings with GGNN propagation, then combines the last clicked item with an attention-weighted summary of the whole session.</p>
+          <a class="paper-ref" href="https://arxiv.org/abs/1811.00855" target="_blank" rel="noopener">Wu et al., 2019 · <span>Session-based Recommendation with Graph Neural Networks</span></a>
+          <h3>Graf sesji i hybrydowa preferencja</h3>
+          <p>SR-GNN zamienia sesję na skierowany graf przejść między produktami i uczy reprezentacje węzłów przez propagację GGNN. Jego kluczowy mechanizm to połączenie dwóch sygnałów: ostatniego kliknięcia jako bieżącej intencji oraz ważonego przez uwagę podsumowania całej sesji jako preferencji globalnej.</p>
         </div>
         <div class="panel">
           <span class="tag">TAGNN</span>
-          <a class="citation" href="https://arxiv.org/abs/2005.02844" target="_blank" rel="noopener">Yu et al., 2020 <span>arXiv:2005.02844</span></a>
-          <h3>Target-aware session preference</h3>
-          <p>Also starts with graph propagation, but changes the session representation for each candidate item being scored.</p>
+          <a class="paper-ref" href="https://arxiv.org/abs/2005.02844" target="_blank" rel="noopener">Yu et al., 2020 · <span>Target Attentive Graph Neural Networks for Session-based Recommendation</span></a>
+          <h3>Target-aware attention</h3>
+          <p>TAGNN również korzysta z grafowej reprezentacji sesji, ale zmienia sposób oceniania produktów. Zamiast jednej stałej reprezentacji sesji tworzy reprezentację zależną od produktu-kandydata: target-aware attention wzmacnia te kliknięcia, które są najbardziej istotne dla aktualnie ocenianego celu.</p>
         </div>
       </div>
-      <p class="small">Both papers use graph-based session modeling. This study keeps their high-level idea and replaces the graph encoder with GAT.</p>
     </section>
 
     <section class="slide">
-      <div class="eyebrow">Research question</div>
-      <h2>What happens if GGNN propagation is replaced by GAT?</h2>
+      <div class="eyebrow">Pytanie badawcze</div>
+      <h2>Co się stanie, gdy propagację GGNN zastąpimy przez GAT?</h2>
       <ul>
-        <li>Does attention-based graph encoding improve next-item recommendation?</li>
-        <li>Does the effect depend on the readout after graph encoding?</li>
-        <li>Can a fully attention-based GAT + SAGPool design compete with the reference architectures?</li>
+        <li>Czy grafowy enkoder oparty na uwadze poprawia predykcję następnego produktu?</li>
+        <li>Czy efekt zależy od sposobu zbudowania reprezentacji sesji po enkodowaniu grafu?</li>
+        <li>Czy w pełni uwagowa architektura GAT + SAGPool może konkurować z modelami odniesienia?</li>
       </ul>
-      <p class="small">The key point is controlled comparison: change the graph encoder, keep the task, datasets, and evaluation metrics aligned with the papers.</p>
+      <p class="small">Kluczowe jest kontrolowane porównanie: zmieniamy enkoder grafowy, a zadanie, zbiory danych i metryki pozostają zgodne z pracami odniesienia.</p>
+    </section>
+
+    <section class="slide compact">
+      <div class="eyebrow">Hipotezy</div>
+      <h2>Zakładaliśmy, że uwaga może pomóc, ale nie w każdym wariancie tak samo</h2>
+      <ul>
+        <li><strong>H1:</strong> GAT nauczy się bardziej selektywnych reprezentacji produktów niż GGNN, bo może różnie ważyć sąsiednie przejścia.</li>
+        <li><strong>H2:</strong> Zysk z GAT będzie zależał od mechanizmu odczytu sesji: SR-GNN, TAGNN i SAGPool wykorzystują reprezentacje w inny sposób.</li>
+        <li><strong>H3:</strong> Połączenie GAT z SAGPool daje spójną architekturę uwagową, która może pokonać SR-GNN i TAGNN.</li>
+      </ul>
     </section>
 
     <section class="slide">
-      <div class="eyebrow">GAT intuition</div>
-      <h2>GAT learns which neighboring items deserve more attention <a class="citation inline" href="https://arxiv.org/abs/1710.10903" target="_blank" rel="noopener">Velickovic et al., 2018 <span>arXiv:1710.10903</span></a></h2>
+      <div class="eyebrow">Intuicja GAT</div>
+      <h2>GAT uczy się, którym sąsiednim produktom poświęcić więcej uwagi <a class="citation inline" href="https://arxiv.org/abs/1710.10903" target="_blank" rel="noopener">Velickovic et al., 2018 <span>arXiv:1710.10903</span></a></h2>
       <div class="two-col">
         <div class="panel">
-          <h3>GGNN-style propagation</h3>
-          <p>Messages are passed through graph edges using recurrent gated updates.</p>
+          <h3>Propagacja typu GGNN</h3>
+          <p>Informacje przechodzą przez krawędzie grafu z użyciem rekurencyjnych, bramkowanych aktualizacji.</p>
         </div>
         <div class="panel">
-          <h3>GAT-style propagation</h3>
-          <p>Messages are still passed through graph edges, but the model learns attention weights over neighboring items.</p>
+          <h3>Propagacja typu GAT</h3>
+          <p>Informacje nadal przechodzą przez krawędzie, ale model uczy się wag uwagi dla sąsiednich produktów.</p>
         </div>
       </div>
-      <p>The practical hypothesis: attention can focus an item embedding on the most useful neighboring clicks instead of treating every transition as equally useful.</p>
+      <p>Intuicja: reprezentacja produktu powinna bardziej korzystać z informacyjnych przejść niż z przypadkowych kliknięć.</p>
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">Final architecture</div>
-      <h2>Shared GAT encoder used by the final models</h2>
+      <div class="eyebrow">Finalna architektura</div>
+      <h2>Wspólny enkoder GAT w finalnych modelach</h2>
       <div class="two-col">
         <div class="panel">
-          <h3>Encoder design</h3>
+          <h3>Projekt enkodera</h3>
           <ul>
-            <li>One node per unique session item</li>
-            <li>Forward and backward transition channels</li>
-            <li>One `GATConv` layer per direction</li>
-            <li>4 attention heads, hidden size 100</li>
-            <li>Plain residual update after GAT</li>
+            <li>Jeden węzeł dla każdego unikalnego produktu w sesji</li>
+            <li>Osobne kanały przejść do przodu i wstecz</li>
+            <li>Jedna warstwa <code>GATConv</code> dla każdego kierunku</li>
+            <li>rozmiar reprezentacji węzła 100 (4 head x 25 dims)</li>
+            <li>Wyjście GAT jest dodawane do wejściowej reprezentacji węzła</li>
           </ul>
         </div>
         <div class="panel">
-          <h3>Edge features</h3>
+          <h3>Cechy krawędzi</h3>
           <ul>
-            <li>Transition probability</li>
-            <li>Repeat strength</li>
-            <li>Recency</li>
-            <li>`edge_dim=3`</li>
-            <li>Attention dropout 0.05, feature dropout 0.10</li>
+            <li><strong>Prawdopodobieństwo przejścia:</strong> jak często po produkcie źródłowym pojawia się dany produkt docelowy.</li>
+            <li><strong>Siła powtórzeń:</strong> czy to samo przejście występowało w sesji wielokrotnie.</li>
+            <li><strong>Świeżość przejścia:</strong> jak późno dane przejście pojawiło się w sekwencji kliknięć.</li>
           </ul>
         </div>
       </div>
-      <p class="small">The same GAT encoder is shared by the final SR-GNN-style and TAGNN-style branches, which makes their readout comparison easier to interpret.</p>
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">SAGPool concept</div>
-      <h2>SAGPool summarizes a graph by keeping its most important nodes <a class="citation inline" href="https://arxiv.org/abs/1904.08082" target="_blank" rel="noopener">Lee et al., 2019 <span>arXiv:1904.08082</span></a></h2>
+      <div class="eyebrow">Koncepcja SAGPool</div>
+      <h2>SAGPool wybiera najważniejsze węzły przed zbudowaniem reprezentacji sesji <a class="citation inline" href="https://arxiv.org/abs/1904.08082" target="_blank" rel="noopener">Lee et al., 2019 <span>arXiv:1904.08082</span></a></h2>
       <div class="two-col">
         <div class="panel">
-          <h3>What it does</h3>
+          <h3>Selekcja węzłów</h3>
           <ul>
-            <li>Assigns an importance score to each node in the session graph.</li>
-            <li>Keeps only the top-scoring nodes.</li>
-            <li>Aggregates the remaining nodes into one graph-level session representation.</li>
+            <li>Wejściem są reprezentacje produktów wyliczone wcześniej przez GAT.</li>
+            <li>SAGPool uczy funkcję punktującą, która nadaje każdemu węzłowi wynik ważności.</li>
+            <li>Model sortuje węzły według tych wyników i zostawia tylko górną część grafu.</li>
+            <li>Reprezentacje zostawionych węzłów są mnożone przez ich wyniki, więc ważniejsze produkty mają silniejszy wpływ.</li>
           </ul>
         </div>
         <div class="panel">
-          <h3>Why test it here</h3>
+          <h3>Agregacja do wektora sesji</h3>
           <ul>
-            <li>SR-GNN and TAGNN are established graph-session architectures.</li>
-            <li>SAGPool gives a different way to turn item nodes into a session vector.</li>
-            <li>It lets us test a more fully attention-based pipeline: GAT for encoding, SAGPool for summarization.</li>
+            <li>Po selekcji zostaje mniejszy graf z najbardziej informacyjnych produktów.</li>
+            <li>Wektory tych produktów są sumaryzowane funkcjami globalnymi: średnią i maksimum po wymiarach.</li>
+            <li>Średnia opisuje ogólny kontekst zachowanych kliknięć, a maksimum wyłapuje najsilniejsze cechy pojedynczych produktów.</li>
+            <li>Wyniki agregacji są łączone z reprezentacją ostatniego kliknięcia i dopiero z tego powstaje finalny wektor sesji.</li>
           </ul>
         </div>
       </div>
-      <p class="small">In this study, SAGPool is exploratory. It is not a direct reproduction of SR-GNN or TAGNN, but a third branch that asks whether attention-based graph pooling can compete with their hand-designed session readouts.</p>
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">Model variants</div>
-      <h2>Three readouts test where GAT helps</h2>
+      <div class="eyebrow">Warianty modeli</div>
+      <h2>Trzy odczyty sesji pokazują, gdzie GAT pomaga</h2>
       <div class="three-col">
         <div class="panel">
           <h3 class="accent-blue">GAT-SR-GNN</h3>
-          <p>GAT encoder with SR-GNN-style local plus global session readout.</p>
+          <p>Enkoder GAT oraz odczyt sesji typu SR-GNN: połączenie sygnału lokalnego i globalnego.</p>
         </div>
         <div class="panel">
           <h3 class="accent-green">GAT-TAGNN</h3>
-          <p>GAT encoder with target-aware readout, so the session vector depends on each candidate.</p>
+          <p>Enkoder GAT oraz odczyt zależny od kandydata, więc reprezentacja sesji zmienia się dla ocenianego produktu.</p>
         </div>
         <div class="panel">
           <h3 class="accent-orange">GAT-SAGPool</h3>
-          <p>GAT encoder with self-attention graph pooling and explicit last-click preservation.</p>
+          <p>Enkoder GAT z poolingiem grafowym opartym na self-attention oraz zachowaniem informacji o ostatnim kliknięciu.</p>
         </div>
       </div>
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">Experimental setup</div>
-      <h2>Evaluation follows the reference studies</h2>
+      <div class="eyebrow">Eksperyment</div>
+      <h2>Ewaluacja jest zgodna z pracami odniesienia</h2>
       <div class="metric-grid">
         <div class="metric">
           <strong>2</strong>
-          <span>Datasets: Yoochoose 1/64 and Diginetica</span>
+          <span>Zbiory danych: Yoochoose 1/64 i Diginetica</span>
         </div>
         <div class="metric">
           <strong>Top-20</strong>
-          <span>The model returns 20 recommended items for each session prefix</span>
+          <span>Model zwraca 20 rekomendacji dla każdego prefiksu sesji</span>
         </div>
         <div class="metric">
           <strong>P@20</strong>
-          <span>Target appears in the top 20</span>
+          <span>Sprawdza, czy właściwy produkt jest w top 20</span>
         </div>
         <div class="metric">
           <strong>MRR@20</strong>
-          <span>Target rank quality inside the top 20</span>
+          <span>Ocena pozycji właściwego produktu w top 20</span>
         </div>
       </div>
-      <p>For each test example, the model scores candidate items and sorts them from most to least likely. Precision@20 asks whether the true next item is anywhere in the top 20; MRR@20 also rewards placing it near the top of that list.</p>
-      <p class="small">Sessions shorter than two interactions and rare items are filtered, then each session is converted into prefix-target examples for next-item prediction.</p>
     </section>
 
     <section class="slide plot-slide">
-      <div class="eyebrow">Model progression</div>
-      <h2>Precision@20 across model iterations</h2>
-      <img class="chart" src="presentation-assets/precision_progression.png" alt="Precision@20 progression for all GAT model iterations">
+      <div class="eyebrow">Rozwój modeli</div>
+      <h2>Precision@20 w kolejnych iteracjach</h2>
+      <img class="chart" src="presentation-assets/precision_progression.png" alt="Zmiany Precision@20 dla kolejnych iteracji modeli GAT">
     </section>
 
     <section class="slide plot-slide">
-      <div class="eyebrow">Model progression</div>
-      <h2>MRR@20 across model iterations</h2>
-      <img class="chart" src="presentation-assets/mrr_progression.png" alt="MRR@20 progression for all GAT model iterations">
+      <div class="eyebrow">Rozwój modeli</div>
+      <h2>MRR@20 w kolejnych iteracjach</h2>
+      <img class="chart" src="presentation-assets/mrr_progression.png" alt="Zmiany MRR@20 dla kolejnych iteracji modeli GAT">
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">Progression summary</div>
-      <h2>Design changes became simpler after failed complex variants</h2>
+      <div class="eyebrow">Podsumowanie iteracji</div>
+      <h2>Jak zmieniała się architektura enkodera GAT</h2>
       <ul>
-        <li>Iteration 1 established the first complete GAT replacement for SR-GNN and TAGNN.</li>
-        <li>Iteration 5 added gated normalization and edge-attribute changes, but performance dropped.</li>
-        <li>Iteration 8 restored the stronger weighted `GATConv` design.</li>
-        <li>Iteration 10 kept the readouts fixed and added three interpretable edge features: probability, repeat strength, and recency.</li>
+        <li>Najpierw powstały pełne warianty GAT-SR-GNN i GAT-TAGNN: zmieniono enkoder grafowy, a odczyty sesji pozostawiono zgodne z modelami odniesienia.</li>
+        <li>Następnie upraszczano stos GAT i testowano bardziej ekspresyjne warianty propagacji, aby sprawdzić, czy sama uwaga wystarczy do poprawy reprezentacji produktów.</li>
+        <li>Kolejny etap przywrócił jawny sygnał struktury sesji: powtarzające się przejścia oraz połączenia rezydualne stabilizujące aktualizację reprezentacji węzłów.</li>
+        <li>Bardziej złożone dodatki, takie jak bramkowanie i normalizacja w stosie GAT, pogorszyły wyniki, więc projekt wrócił do prostszego ważonego <code>GATConv</code>.</li>
+        <li>Finalnie zachowano stałe odczyty SR-GNN/TAGNN, a krawędzie opisano trzema interpretowalnymi cechami: prawdopodobieństwem przejścia, siłą powtórzeń i świeżością.</li>
       </ul>
     </section>
 
     <section class="slide plot-slide">
-      <div class="eyebrow">Main comparison</div>
-      <h2>Paper baselines and final GAT architectures side by side</h2>
-      <img class="chart" src="presentation-assets/main_results_2x2.png" alt="Published paper results and final GAT architectures across both datasets and metrics">
+      <div class="eyebrow">Główne porównanie</div>
+      <h2>Wyniki z publikacji i finalne architektury GAT</h2>
+      <img class="chart" src="presentation-assets/main_results_2x2.png" alt="Wyniki z publikacji i finalne architektury GAT dla obu zbiorów danych i metryk">
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">Main comparison</div>
-      <h2>What the result chart shows</h2>
+      <div class="eyebrow">Główne porównanie</div>
+      <h2>Co pokazują wyniki</h2>
       <ul>
-        <li>The main comparison uses iteration 10 for GAT-SR-GNN and GAT-TAGNN, and `results-newest` for GAT-SAGPool.</li>
-        <li>Precision@20 and MRR@20 should be read together: one measures hit rate, the other measures rank quality.</li>
-        <li>GAT-TAGNN is the most competitive final GAT variant across the two datasets.</li>
-        <li>SAGPool is a useful exploratory branch, but it does not consistently beat the established readouts.</li>
+        <li>GAT-SR-GNN ma nieznacznie słabsze wyniki niż SR-GNN z publikacji</li>
+        <li>GAT-TAGNN jest najbardziej konkurencyjnym finalnym wariantem GAT na obu zbiorach danych. GAT-TAGNN poprawia wyniki TAGNN z publikacji na obu zbiorach danych.</li>
+        <li>SAGPool jest wartościową gałęzią eksploracyjną, ale nie pokonuje stabilnie odczytów znanych z SR-GNN i TAGNN.</li>
       </ul>
     </section>
 
     <section class="slide compact">
-      <div class="eyebrow">Result selection</div>
-      <h2>Use final selected architectures for the main story</h2>
+      <div class="eyebrow">Interpretacja</div>
+      <h2>GAT pomaga wtedy, gdy odczyt potrafi wykorzystać relacje produktu-kandydata</h2>
       <ul>
-        <li>Presenting one final architecture per model avoids cherry-picking different historical runs.</li>
-        <li>Use iteration 10 for GAT-SR-GNN and GAT-TAGNN because both share the same final GAT encoder.</li>
-        <li>Use `results-newest` for GAT-SAGPool when presenting the final shared-edge SAGPool variant.</li>
-        <li>Historical best rows belong in the progression discussion, not the headline comparison.</li>
+        <li>GAT-TAGNN daje niewielką poprawę, bo target-aware attention ocenia kliknięcia w kontekście konkretnego produktu-kandydata.</li>
+        <li>Dzięki temu bogatsze reprezentacje z GAT nie są od razu ściskane do jednego stałego wektora sesji, tylko mogą wpływać na ranking zależnie od ocenianego celu.</li>
+        <li>GAT-SR-GNN nieco pogarsza wyniki, bo odczyt SR-GNN tworzy jedną hybrydową reprezentację sesji opartą na ostatnim kliknięciu i globalnym podsumowaniu.</li>
+        <li>W takim odczycie dodatkowy, bardziej selektywny sygnał z GAT może zostać rozmyty albo wprowadzić szum, którego oryginalny GGNN z bramkowaniem lepiej tłumił.</li>
       </ul>
-    </section>
-
-    <section class="slide compact">
-      <div class="eyebrow">Interpretation</div>
-      <h2>GAT helps most when the readout is target-aware</h2>
-      <ul>
-        <li>GAT-TAGNN is the strongest final GAT branch overall.</li>
-        <li>It slightly exceeds TAGNN paper Precision@20 on Diginetica and MRR@20 on Yoochoose.</li>
-        <li>GAT-SR-GNN remains close to SR-GNN, but it does not clearly improve the original paper baseline.</li>
-        <li>GAT-SAGPool is competitive on Yoochoose, but weaker on Diginetica in the final run.</li>
-      </ul>
-      <p class="small">This suggests that better graph encoding is useful, but the downstream session representation controls how much of that signal reaches the final ranking.</p>
     </section>
 
     <section class="slide">
-      <div class="eyebrow">Conclusions</div>
-      <h2>Main takeaways</h2>
+      <div class="eyebrow">Wnioski</div>
+      <h2>Najważniejsze obserwacje</h2>
       <ul>
-        <li>Replacing GGNN with GAT is feasible in graph-based session recommendation.</li>
-        <li>The encoder alone is not the full answer: readout design strongly controls the outcome.</li>
-        <li>The best final direction is GAT encoding paired with TAGNN-style target-aware scoring.</li>
-        <li>More attention components do not automatically improve results, as SAGPool shows.</li>
+        <li>Najbardziej obiecujący kierunek to GAT połączony z odczytem zależnym od produktu-kandydata, tak jak w TAGNN.</li>
+        <li>Wariant SR-GNN pokazuje, że lepszy lub bardziej ekspresyjny enkoder nie gwarantuje lepszego rankingu, jeśli odczyt sesji nie wykorzystuje jego informacji.</li>
+        <li>Mechanizmy stabilizujące GGNN, szczególnie bramkowanie, mogły być korzystne dla odczytu SR-GNN i ich prosta zamiana na GAT nie zachowuje tej samej dynamiki.</li>
+        <li>SAGPool pozostaje eksperymentem z inną formą odczytu grafu, ale sama selekcja ważnych węzłów nie zastąpiła skutecznie target-aware scoring. Wymagane jest dalsze dopracowanie tego mechanizmu.</li>
       </ul>
     </section>
 
