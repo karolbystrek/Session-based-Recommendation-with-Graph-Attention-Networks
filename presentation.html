@@ -625,15 +625,17 @@
             <li>Model sortuje węzły według tych wyników i zostawia tylko górną część grafu.</li>
             <li>Reprezentacje zostawionych węzłów są mnożone przez ich wyniki, więc ważniejsze produkty mają silniejszy wpływ.</li>
           </ul>
+          <h4>Czyli model sam wybiera, które kliknięcia w sesji wziąć najbardziej pod uwagę, a które można pominąć</h4>
         </div>
         <div class="panel">
           <h3>Agregacja do wektora sesji</h3>
           <ul>
             <li>Po selekcji zostaje mniejszy graf z najbardziej informacyjnych produktów.</li>
-            <li>Wektory tych produktów są sumaryzowane funkcjami globalnymi: średnią i maksimum po wymiarach.</li>
+            <li>Wektory tych produktów są sumaryzowane funkcjami globalnymi: średnią i maksimum.</li>
             <li>Średnia opisuje ogólny kontekst zachowanych kliknięć, a maksimum wyłapuje najsilniejsze cechy pojedynczych produktów.</li>
             <li>Wyniki agregacji są łączone z reprezentacją ostatniego kliknięcia i dopiero z tego powstaje finalny wektor sesji.</li>
           </ul>
+          <h4>Z ważnych węzłów robimy podsumowanie sesji i dokładamy sygnał z ostatniego kliknięcia</h4>
         </div>
       </div>
     </section>
