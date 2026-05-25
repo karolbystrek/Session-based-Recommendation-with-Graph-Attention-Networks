@@ -47,6 +47,19 @@
       inset: 0;
     }
 
+    .speaker-tag {
+      position: absolute;
+      top: clamp(20px, 3vw, 40px);
+      right: clamp(20px, 3vw, 40px);
+      z-index: 12;
+      color: var(--ink);
+      font-size: clamp(28px, 3.2vw, 42px);
+      font-weight: 800;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
     .slide.active {
       display: flex;
       flex-direction: column;
@@ -312,6 +325,45 @@
       color: var(--orange);
     }
 
+    .slide.closing-slide.active {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+    }
+
+    .closing-slide h2 {
+      max-width: none;
+    }
+
+    .closing-graph {
+      width: min(760px, 92vw);
+      aspect-ratio: 16 / 9;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fbfcfe 0%, #f3f6fa 100%);
+    }
+
+    .closing-graph .node-label {
+      font-size: 15px;
+      font-weight: 700;
+      fill: #fff;
+    }
+
+    .closing-authors {
+      margin: 0;
+      max-width: none;
+      color: var(--ink);
+      font-size: clamp(20px, 2vw, 30px);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .closing-authors span {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
     .progress {
       position: fixed;
       left: 0;
@@ -390,12 +442,14 @@
 <body>
   <main class="deck" aria-live="polite">
     <section class="slide active">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Prezentacja badania</div>
       <h1>Session-based Recommendation with Graph Attention Networks</h1>
       <p>W badaniu sprawdzamy, czy enkoder GAT może zastąpić propagację GGNN (Gated Graph Neural Network) w grafowych modelach predykcji następnego produktu.</p>
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Problem</div>
       <h2>Przewidzieć następny produkt w krótkiej anonimowej sesji</h2>
       <div class="flow">
@@ -409,6 +463,7 @@
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Dlaczego to trudne</div>
       <h2>Krótkie sesje zawierają słaby i zaszumiony sygnał</h2>
       <div class="three-col">
@@ -428,27 +483,38 @@
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Reprezentacja grafowa</div>
       <h2>Sesję można zapisać jako graf przejść między produktami</h2>
       <div class="two-col">
-        <svg class="graph-demo" viewBox="0 0 640 360" role="img" aria-label="Przykład grafu sesji">
+        <svg class="closing-graph" viewBox="0 0 760 430" role="img" aria-label="Graf sesji: telefon, etui, ładowarka">
           <defs>
-            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <marker id="session-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
               <path d="M0,0 L0,6 L9,3 z" fill="#59636f"></path>
             </marker>
+            <marker id="session-arrow-accent" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#d95f02"></path>
+            </marker>
+            <filter id="session-node-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#17202a" flood-opacity="0.12"></feDropShadow>
+            </filter>
           </defs>
-          <line x1="145" y1="170" x2="270" y2="110" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
-          <line x1="315" y1="130" x2="430" y2="185" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
-          <line x1="430" y1="220" x2="260" y2="250" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
-          <line x1="230" y1="250" x2="130" y2="195" stroke="#59636f" stroke-width="5" marker-end="url(#arrow)"></line>
-          <circle cx="115" cy="180" r="48" fill="#1f77b4"></circle>
-          <circle cx="310" cy="105" r="48" fill="#2ca02c"></circle>
-          <circle cx="470" cy="205" r="48" fill="#d95f02"></circle>
-          <circle cx="230" cy="260" r="48" fill="#8c8c8c"></circle>
-          <text x="115" y="188" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">A</text>
-          <text x="310" y="113" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">B</text>
-          <text x="470" y="213" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">C</text>
-          <text x="230" y="268" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">D</text>
+          <line x1="195" y1="248" x2="318" y2="168" stroke="#59636f" stroke-width="5" marker-end="url(#session-arrow)"></line>
+          <line x1="442" y1="168" x2="565" y2="248" stroke="#59636f" stroke-width="5" marker-end="url(#session-arrow)"></line>
+          <line x1="195" y1="248" x2="565" y2="248" stroke="#d9dee6" stroke-width="3" stroke-dasharray="10 8"></line>
+          <line x1="318" y1="168" x2="565" y2="248" stroke="#d95f02" stroke-width="6" marker-end="url(#session-arrow-accent)" opacity="0.95"></line>
+          <g filter="url(#session-node-shadow)">
+            <circle cx="155" cy="255" r="62" fill="#1f77b4"></circle>
+            <circle cx="380" cy="155" r="62" fill="#2ca02c"></circle>
+            <circle cx="605" cy="255" r="62" fill="#d95f02"></circle>
+            <circle cx="380" cy="330" r="48" fill="#8c8c8c"></circle>
+          </g>
+          <text x="155" y="262" text-anchor="middle" class="node-label">telefon</text>
+          <text x="380" y="162" text-anchor="middle" class="node-label">etui</text>
+          <text x="605" y="262" text-anchor="middle" class="node-label">ładowarka</text>
+          <text x="380" y="338" text-anchor="middle" font-size="22" fill="#fff" font-weight="700">?</text>
+          <text x="380" y="395" text-anchor="middle" font-size="16" fill="#59636f" font-weight="600">następne kliknięcie</text>
+          <text x="380" y="55" text-anchor="middle" font-size="14" fill="#59636f" font-weight="600">sesja użytkownika</text>
         </svg>
         <ul>
           <li>Węzły to unikalne produkty występujące w sesji.</li>
@@ -461,6 +527,7 @@
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Modele odniesienia</div>
       <h2>Badanie opiera się na dwóch grafowych architekturach</h2>
       <div class="two-col">
@@ -480,6 +547,7 @@
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Pytanie badawcze</div>
       <h2>Co się stanie, gdy propagację GGNN zastąpimy przez GAT?</h2>
       <ul>
@@ -491,6 +559,7 @@
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Hipotezy</div>
       <h2>Zakładaliśmy, że uwaga może pomóc, ale nie w każdym wariancie tak samo</h2>
       <ul>
@@ -501,6 +570,7 @@
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Intuicja GAT</div>
       <h2>GAT uczy się, którym sąsiednim produktom poświęcić więcej uwagi <a class="citation inline" href="https://arxiv.org/abs/1710.10903" target="_blank" rel="noopener">Velickovic et al., 2018 <span>arXiv:1710.10903</span></a></h2>
       <div class="two-col">
@@ -517,6 +587,7 @@
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Finalna architektura</div>
       <h2>Wspólny enkoder GAT w finalnych modelach</h2>
       <div class="two-col">
@@ -542,6 +613,7 @@
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Koncepcja SAGPool</div>
       <h2>SAGPool wybiera najważniejsze węzły przed zbudowaniem reprezentacji sesji <a class="citation inline" href="https://arxiv.org/abs/1904.08082" target="_blank" rel="noopener">Lee et al., 2019 <span>arXiv:1904.08082</span></a></h2>
       <div class="two-col">
@@ -567,6 +639,7 @@
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Warianty modeli</div>
       <h2>Trzy odczyty sesji pokazują, gdzie GAT pomaga</h2>
       <div class="three-col">
@@ -586,6 +659,7 @@
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Eksperyment</div>
       <h2>Ewaluacja jest zgodna z pracami odniesienia</h2>
       <div class="metric-grid">
@@ -609,18 +683,21 @@
     </section>
 
     <section class="slide plot-slide">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Rozwój modeli</div>
       <h2>Precision@20 w kolejnych iteracjach</h2>
       <img class="chart" src="presentation-assets/precision_progression.png" alt="Zmiany Precision@20 dla kolejnych iteracji modeli GAT">
     </section>
 
     <section class="slide plot-slide">
+      <span class="speaker-tag">P</span>
       <div class="eyebrow">Rozwój modeli</div>
       <h2>MRR@20 w kolejnych iteracjach</h2>
       <img class="chart" src="presentation-assets/mrr_progression.png" alt="Zmiany MRR@20 dla kolejnych iteracji modeli GAT">
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Podsumowanie iteracji</div>
       <h2>Jak zmieniała się architektura enkodera GAT</h2>
       <ul>
@@ -633,12 +710,14 @@
     </section>
 
     <section class="slide plot-slide">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Główne porównanie</div>
       <h2>Wyniki z publikacji i finalne architektury GAT</h2>
       <img class="chart" src="presentation-assets/main_results_2x2.png" alt="Wyniki z publikacji i finalne architektury GAT dla obu zbiorów danych i metryk">
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Główne porównanie</div>
       <h2>Co pokazują wyniki</h2>
       <ul>
@@ -649,6 +728,7 @@
     </section>
 
     <section class="slide compact">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Interpretacja</div>
       <h2>GAT pomaga wtedy, gdy odczyt potrafi wykorzystać relacje produktu-kandydata</h2>
       <ul>
@@ -660,6 +740,7 @@
     </section>
 
     <section class="slide">
+      <span class="speaker-tag">K</span>
       <div class="eyebrow">Wnioski</div>
       <h2>Najważniejsze obserwacje</h2>
       <ul>
@@ -668,6 +749,13 @@
         <li>Mechanizmy stabilizujące GGNN, szczególnie bramkowanie, mogły być korzystne dla odczytu SR-GNN i ich prosta zamiana na GAT nie zachowuje tej samej dynamiki.</li>
         <li>SAGPool pozostaje eksperymentem z inną formą odczytu grafu, ale sama selekcja ważnych węzłów nie zastąpiła skutecznie target-aware scoring. Wymagane jest dalsze dopracowanie tego mechanizmu.</li>
       </ul>
+    </section>
+
+    <section class="slide closing-slide">
+      <span class="speaker-tag"></span>
+      <div class="eyebrow">Koniec</div>
+      <h2>Dziękujemy za uwagę</h2>
+      <p class="closing-authors">Karol Bystrek <span>·</span> Patryk Chamera</p>
     </section>
 
   </main>
